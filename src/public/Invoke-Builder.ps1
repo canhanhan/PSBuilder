@@ -1,9 +1,10 @@
-function Invoke-BuildHelper
+function Invoke-Builder
 {
+    [CmdletBinding()]
     param (
 
-        [Parameter(Mandatory=$true, Position=0,  ValueFromRemainingArguments=$true)]
-        [string[]]$Tasks,
+        [Parameter(Position=0, ValueFromRemainingArguments=$true)]
+        [string[]]$Tasks = (, "default"),
 
         [Parameter(Mandatory=$false)]
         [ValidateNotNullOrEmpty()]
@@ -11,7 +12,11 @@ function Invoke-BuildHelper
 
         [Parameter(Mandatory=$false)]
         [ValidateNotNull()]
-        [hashtable]$Configuration=@{}
+        [hashtable]$Configuration=@{},
+
+        [Parameter(Mandatory=$false)]
+        [ValidateNotNullOrEmpty()]
+        [string[]]$TestTags
     )
 
     $buildRoot = (Get-Location).Path

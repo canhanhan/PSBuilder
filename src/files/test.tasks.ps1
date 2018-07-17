@@ -1,6 +1,6 @@
-task RunPester -requiredVariables "buildRoot", "mergedFilePath", "isScript", "CodeCoverageMin" {
-    $testResult = Start-Job -ArgumentList ("$BuildRoot\tests", $mergedFilePath, $isScript) -ScriptBlock {
-        param($testPath, $filePath, $isScript)
+task RunPester -requiredVariables "buildRoot", "mergedFilePath", "isScript", "CodeCoverageMin", "TestTags" {
+    $testResult = Start-Job -ArgumentList ("$BuildRoot\tests", $mergedFilePath, $isScript, $testTags) -ScriptBlock {
+        param($testPath, $filePath, $isScript, $tags)
 
         Set-StrictMode -Version Latest
         $ErrorActionPreference = "Stop"
@@ -10,7 +10,7 @@ task RunPester -requiredVariables "buildRoot", "mergedFilePath", "isScript", "Co
         try
         {
             if ($isScript) { . $filePath } else { Import-Module -Name $filePath -Force }
-            Invoke-Pester -PassThru -Verbose -CodeCoverage $filePath
+            Invoke-Pester -PassThru -Verbose -CodeCoverage $filePath -Tag $tags
         }
         finally
         {

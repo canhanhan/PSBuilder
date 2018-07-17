@@ -6,14 +6,14 @@ Describe_WithSampleModule "Test" {
     }
 
     It "executes tests" {
-        Invoke-BuildHelper Test
+        Invoke-Builder Test
         $psake.build_success | Should -BeTrue
     }
 
     It "fails when tests fail" {
         New-Item -Path "$ModulePath/tests/fail.txt"
 
-        { Invoke-BuildHelper Test } | Should -Throw
+        { Invoke-Builder Test } | Should -Throw
         $psake.build_success | Should -BeFalse
     }
 }
