@@ -7,6 +7,7 @@ Properties {
     $SourceFilePath = "$SourcePath/$Name.psm1"
     $MergedFilePath = "$PSScriptRoot/output/$Name.psm1"
     $IsScript = $false
+    $CodeCoverageMin = 100
 }
 
 Include "$PSScriptRoot/src/files/build.tasks.ps1"

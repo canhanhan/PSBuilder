@@ -49,6 +49,7 @@ function Invoke-BuildHelper
     if (-not $Configuration.ContainsKey("BuildOutput")) { $Configuration["BuildOutput"] = Join-Path -Path $buildRoot -ChildPath "output" }
     if (-not $Configuration.ContainsKey("SourcePath")) { $Configuration["SourcePath"] = Join-Path -Path $buildRoot -ChildPath "src" }
     if (-not $Configuration.ContainsKey("Name")) { $Configuration["Name"] = [IO.Path]::GetFileName([IO.Path]::GetDirectoryName($buildRoot + "/")) }
+    if (-not $Configuration.ContainsKey("CodeCoverageMin")) { $Configuration["CodeCoverageMin"] = 0 }
 
     if (-not $Configuration["IsScript"])
     {

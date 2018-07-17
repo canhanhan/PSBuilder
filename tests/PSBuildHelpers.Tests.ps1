@@ -1,22 +1,7 @@
-Set-StrictMode -Version Latest
-$ErrorActionPreference = "Stop"
-Describe "PSBuildHelpers" {
+. ./TestHelper.ps1
+
+Describe_WithSampleModule "PSBuildHelpers" {
     Context "Module" {
-        BeforeEach {
-            $ModuleSource = "$PSScriptRoot/../examples/SampleModule"
-            $ModulePath = Join-Path -Path $testDrive -ChildPath "SampleModule"
-
-            if (Test-Path $ModulePath) { Remove-Item -Path $ModulePath -Recurse -Force }
-            Copy-Item -Path $ModuleSource -Destination $testDrive -Recurse
-
-            Push-Location -Path $ModulePath -StackName "TestPath"
-            $OutputPath = Join-Path -Path $ModulePath -ChildPath "Output"
-        }
-
-        AfterEach {
-            Pop-Location -StackName "TestPath" -ErrorAction SilentlyContinue
-        }
-
         Describe "Clean" {
             It "removes output directory" {
                 New-Item -Path $OutputPath -ItemType Directory
