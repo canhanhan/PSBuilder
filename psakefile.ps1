@@ -9,6 +9,4 @@ Properties {
     $IsScript = $false
 }
 
-. "$PSScriptRoot/src/private/Invoke-ReplaceMagicMarker.ps1"
-
 Include "$PSScriptRoot/src/files/build.tasks.ps1"
