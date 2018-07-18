@@ -1,3 +1,23 @@
+task Analyze -requiredVariables "BuildOutput", "AnalysisFailureLevel", "AnalysisSettingsFile" {
+    $analysisParameters = @{ "Path"= $BuildOutput }
+    if (-not [string]::IsNullOrEmpty($AnalysisSettingsFile)) { $analysisParameters["Settings"] = $AnalysisSettingsFile }
+    $analysisResult = Invoke-ScriptAnalyzer @analysisParameters -Recurse
+    $analysisResult | Format-Table
+
+    $warnings = $analysisResult.Where({ $_.Severity -eq "Warning" -or $_.Severy -eq "Warning" }).Count
+    $errors = $analysisResult.Where({ $_.Severy -eq "Error" }).Count
+    "Script analyzer triggered {0} warnings and {1} errors" -f $warnings, $errors
+
+    if ($AnalysisFailureLevel -eq "Warning")
+    {
+        Assert -conditionToCheck ($warnings -eq 0 -and $errors -eq 0) -failureMessage "Build failed due to warnings or errors found in analysis."
+    }
+    elseif ($AnalysisFailureLevel -eq "Error")
+    {
+        Assert -conditionToCheck ($errors -eq 0) -failureMessage "Build failed due to errors found in analysis."
+    }
+}
+
 task RunPester -requiredVariables "buildRoot", "mergedFilePath", "isScript", "CodeCoverageMin", "TestTags" {
     $testResult = Start-Job -ArgumentList ("$BuildRoot\tests", $mergedFilePath, $isScript, $testTags) -ScriptBlock {
         param($testPath, $filePath, $isScript, $tags)
@@ -26,4 +46,4 @@ task RunPester -requiredVariables "buildRoot", "mergedFilePath", "isScript", "Co
     assert ($CodeCoverageMin -le $testCoverage) ('Code coverage must be higher or equal to {0}%. Current coverage: {1}%' -f ($CodeCoverageMin, $testCoverage))
 }
 
-task Test -depends Stage, RunPester
+task Test -depends Stage, Analyze, RunPester

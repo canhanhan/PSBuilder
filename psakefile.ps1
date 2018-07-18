@@ -7,8 +7,10 @@ Properties {
     $SourceFilePath = "$SourcePath/$Name.psm1"
     $MergedFilePath = "$PSScriptRoot/output/$Name.psm1"
     $IsScript = $false
-    $CodeCoverageMin = 100
-    $TestTags = (,"Run")
+    $CodeCoverageMin = 60
+    $AnalysisFailureLevel = "Error"
+    $AnalysisSettingsFile = ""
+    $TestTags = @()
 }
 
 Include "$PSScriptRoot/src/files/build.tasks.ps1"

@@ -47,6 +47,9 @@ function Invoke-Builder
     if (-not $Configuration.ContainsKey("SourcePath")) { $Configuration["SourcePath"] = Join-Path -Path $buildRoot -ChildPath "src" }
     if (-not $Configuration.ContainsKey("Name")) { $Configuration["Name"] = [IO.Path]::GetFileName([IO.Path]::GetDirectoryName($buildRoot + "/")) }
     if (-not $Configuration.ContainsKey("CodeCoverageMin")) { $Configuration["CodeCoverageMin"] = 0 }
+    if (-not $Configuration.ContainsKey("TestTags")) { $Configuration["TestTags"] = @() }
+    if (-not $Configuration.ContainsKey("AnalysisFailureLevel")) { $Configuration["AnalysisFailureLevel"] = "None" }
+    if (-not $Configuration.ContainsKey("AnalysisSettingsFile")) { $Configuration["AnalysisSettingsFile"] = "" }
 
     if (-not $Configuration["IsScript"])
     {

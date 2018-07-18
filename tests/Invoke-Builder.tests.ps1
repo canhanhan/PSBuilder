@@ -50,6 +50,9 @@ Describe "Invoke-Builder" {
                 "ManifestDestination" | Should -BeIn $Configuration.Keys
                 "SourceFilePath" | Should -BeIn $Configuration.Keys
                 "MergedFilePath" | Should -BeIn $Configuration.Keys
+                "AnalysisFailureLevel" | Should -BeIn $Configuration.Keys
+                "AnalysisSettingsFile" | Should -BeIn $Configuration.Keys
+                "TestTags" | Should -BeIn $Configuration.Keys
             }
 
             It "sets default values for modules" {
