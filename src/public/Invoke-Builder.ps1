@@ -1,45 +1,37 @@
 function Invoke-Builder
 {
-    [CmdletBinding()]
+    [CmdletBinding(DefaultParameterSetName="Default")]
     param (
-
         [Parameter(Position=0, ValueFromRemainingArguments=$true)]
         [string[]]$Tasks = (, "default"),
 
-        [Parameter(Mandatory=$false)]
+        [Parameter(Mandatory=$true, ParameterSetName="UseFile")]
         [ValidateNotNullOrEmpty()]
-        [string]$ConfigurationFile,
+        [string]$ConfigurationFile="build.json",
 
-        [Parameter(Mandatory=$false)]
+        [Parameter(Mandatory=$true, ParameterSetName="UseHashtable")]
         [ValidateNotNull()]
         [hashtable]$Configuration=@{},
 
         [Parameter(Mandatory=$false)]
         [ValidateNotNullOrEmpty()]
-        [string[]]$TestTags
+        [string[]]$TestTags,
+
+        [switch]$ThrowOnError,
+        [switch]$ExitWithCode
     )
 
     $buildRoot = (Get-Location).Path
     $buildFile = "$PSScriptRoot/files/build.tasks.ps1"
 
-    if ([string]::IsNullOrEmpty($ConfigurationFile))
-    {
-        $FailIfConfigMissing = $false
-        $ConfigurationFile = Join-Path -Path $buildRoot -ChildPath "build.json"
-    }
-    else
-    {
-        $FailIfConfigMissing = $true
-    }
-
     if (-not [IO.Path]::IsPathRooted($ConfigurationFile))
     {
-        $ConfigurationFile = Join-Path -Path $buildRoot -ChildPath $ConfigurationFile
+       $ConfigurationFile = Join-Path -Path $buildRoot -ChildPath $ConfigurationFile
     }
 
     if (-not (Test-Path -Path $ConfigurationFile))
     {
-        if ($FailIfConfigMissing) { throw "Configuration file does not exist in $ConfigurationFile" }
+        if ($PSCmdlet.ParameterSetName -eq "UseFile") { throw "Configuration file does not exist in $ConfigurationFile" }
     }
     else
     {
@@ -72,6 +64,14 @@ function Invoke-Builder
 
     if (-not $Psake.build_success)
     {
-        throw $psakeResult
+        if (-not $ExitWithCode -and $ThrowOnError)
+        {
+            throw $psakeResult
+        }
+
+        if ($ExitWithCode)
+        {
+            Exit-Powershell -ExitCode 1
+        }
     }
 }
