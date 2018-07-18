@@ -13,7 +13,7 @@ task "CopyFiles" -depends "CreateOutputDir" -requiredVariables "SourcePath" {
     }
 }
 
-task "CompileModule" -precondition { -not $IsScript } -depends "CreateOutputDir", "CopyFiles" {
+task "CompileModule" -precondition { -not $IsScript } -depends "CreateOutputDir", "CopyFiles" -requiredVariables "ManifestDestination" {
     $publicFolder = Join-Path -Path $SourcePath -ChildPath "Public"
     $publicFunctions = @(Get-ChildItem -Path $publicFolder -Filter "*.ps1" -Recurse).ForEach({ $_.BaseName })
 
