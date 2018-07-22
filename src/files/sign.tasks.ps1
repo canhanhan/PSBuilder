@@ -49,7 +49,6 @@ task "SelectCert" {
     $Script:Certificate = @($Certificates).Where({ Test-Certificate -Cert $_ -ErrorAction SilentlyContinue }) | Sort-Object -Descending -Property NotAfter | Select-Object -First 1
     if ($null -eq $Certificate)
     {
-        Write-Host $Certificates[0]
         throw "$($Certificates.Count) code signing certificates were found but none are valid."
     }
 }
