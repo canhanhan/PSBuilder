@@ -1,6 +1,6 @@
 Properties {
     $Name = 'PSBuilder'
-    $PublishRepository = "Test"
+    $PublishRepository = "PSGallery"
     $CodeCoverageMin = 60
 }
 
