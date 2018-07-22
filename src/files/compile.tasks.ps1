@@ -1,3 +1,10 @@
+task "Clean" -requiredVariables "BuildOutput" {
+    if (Test-Path $BuildOutput)
+    {
+        Remove-Item -Path $BuildOutput -Force -Recurse
+    }
+}
+
 task "CreateOutputDir" -depends "Clean" -requiredVariables "BuildOutput" {
     if (-not (Test-Path $BuildOutput))
     {
@@ -21,7 +28,7 @@ task "CopyLicense" -depends "CreateOutputDir" -requiredVariables "BuildRoot", "B
     }
 }
 
-task "CompileModule" -precondition { -not $IsScript } -depends "CreateOutputDir", "CopyFiles", "CopyLicense" -requiredVariables "ManifestDestination" {
+task "CompileModule" -depends "CreateOutputDir", "CopyFiles", "CopyLicense" -requiredVariables "ManifestDestination" {
     $publicFolder = Join-Path -Path $SourcePath -ChildPath "Public"
     $publicFunctions = @(Get-ChildItem -Path $publicFolder -Filter "*.ps1" -Recurse).ForEach({ $_.BaseName })
 
@@ -58,39 +65,5 @@ task "CompileModule" -precondition { -not $IsScript } -depends "CreateOutputDir"
     Copy-Item -Path $ManifestFilePath -Destination $ManifestDestination
 }
 
-task "CreateOrCopyScriptFile" -precondition { $IsScript } -depends "CreateOutputDir" -requiredVariables "SourceFilePath", "MergedFilePath" {
-    if (Test-Path -Path $SourceFilePath)
-    {
-        Copy-Item -Path $SourceFilePath -Destination $MergedFilePath
-    }
-    else
-    {
-        $builder = [System.Text.StringBuilder]::new()
-        [void]$builder.AppendLine("Set-StrictMode -Version Latest")
-        [void]$builder.AppendLine("`$ErrorActionPreference='Stop'")
-        [void]$builder.AppendLine("### MERGE HERE ###")
-        Set-Content -Path $MergedFilePath -Value ($builder.ToString()) -Force
-    }
-}
-
-task "CompileScript" -precondition { $IsScript } -depends "CreateOutputDir", "CreateOrCopyScriptFile" {
-    Invoke-ReplaceMagicMarker -Builder {
-        $builder = [System.Text.StringBuilder]::new()
-
-        $files = Get-ChildItem -Path $SourcePath -Filter "*.ps1" -Recurse
-        foreach ($file in $files)
-        {
-            $content = Get-Content -Path $file.FullName -Raw
-            [void]$builder.AppendLine("")
-            [void]$builder.AppendLine("##### BEGIN $($file.Name) #####")
-            [void]$builder.AppendLine($content)
-            [void]$builder.AppendLine("##### END $($file.Name) #####")
-            [void]$builder.AppendLine("")
-        }
-
-        $builder.ToString()
-    }
-}
-
-task Compile -depends CompileModule, CompileScript
+task Compile -depends CompileModule
 task Stage -depends Clean, CreateOutputDir, Compile, Sign

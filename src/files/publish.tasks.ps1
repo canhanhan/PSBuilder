@@ -12,14 +12,7 @@ task PublishToRepository -depends Stage {
         $publishParams["NuGetApiKey"] = $nugetApiKey
     }
 
-    if ($IsScript)
-    {
-        Publish-Script @publishParams
-    }
-    else
-    {
-        Publish-Module @publishParams
-    }
+    Publish-Module @publishParams
 }
 
 
