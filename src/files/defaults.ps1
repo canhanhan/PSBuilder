@@ -1,33 +1,36 @@
-Properties {
-    $IsScript = $false
-    $BuildRoot = $psake.build_script_dir
-
-    if (-not (Test-Path -Path "Variable:Name"))
+function SetDefault($Name, $Value)
+{
+    if (-not (Test-Path -Path "Variable:$Name"))
     {
-        $Name = [IO.Path]::GetFileName([IO.Path]::GetDirectoryName($BuildRoot + "/"))
+        Set-Variable -Name $Name -Value $Value -Scope Script
     }
+}
 
-    $BuildOutput = Join-Path -Path $BuildRoot -ChildPath "output"
-    $SourcePath = Join-Path -Path $BuildRoot -ChildPath "src"
+Properties {
+    SetDefault "IsScript" $false
+    SetDefault "BuildRoot" $psake.build_script_dir
+    SetDefault "Name" ([IO.Path]::GetFileName([IO.Path]::GetDirectoryName($BuildRoot + "/")))
+    SetDefault "BuildOutput" (Join-Path -Path $BuildRoot -ChildPath "output")
+    SetDefault "SourcePath" (Join-Path -Path $BuildRoot -ChildPath "src")
 
     if ($IsScript)
     {
-        $SourceFilePath = Join-Path -Path $SourcePath -ChildPath "$Name.ps1"
-        $MergedFilePath = Join-Path -Path $BuildOutput -ChildPath "$Name.ps1"
+        SetDefault "SourceFilePath" (Join-Path -Path $SourcePath -ChildPath "$Name.ps1")
+        SetDefault "MergedFilePath" (Join-Path -Path $BuildOutput -ChildPath "$Name.ps1")
     }
     else
     {
-        $SourceFilePath = Join-Path -Path $SourcePath -ChildPath "$Name.psm1"
-        $ManifestDestination = Join-Path -Path $BuildOutput -ChildPath "$Name.psd1"
-        $MergedFilePath = Join-Path -Path $BuildOutput -ChildPath "$Name.psm1"
+        SetDefault "SourceFilePath" (Join-Path -Path $SourcePath -ChildPath "$Name.psm1")
+        SetDefault "ManifestDestination" (Join-Path -Path $BuildOutput -ChildPath "$Name.psd1")
+        SetDefault "MergedFilePath" (Join-Path -Path $BuildOutput -ChildPath "$Name.psm1")
     }
 
-    $CodeCoverageMin = 0
-    $AnalysisFailureLevel = "Error"
-    $AnalysisSettingsFile = ""
-    $TestTags = @()
-    $DocumentationPath = "$PSScriptRoot/docs"
+    SetDefault "CodeCoverageMin" 0
+    SetDefault "AnalysisFailureLevel" "Error"
+    SetDefault "AnalysisSettingsFile" ""
+    SetDefault "TestTags" @()
+    SetDefault "DocumentationPath" "$PSScriptRoot/docs"
 
-    $ExtensionsToSign = "*.ps1", "*.psd1", "*.psm1"
-    $SignFiles = $true
+    SetDefault "ExtensionsToSign" "*.ps1", "*.psd1", "*.psm1"
+    SetDefault "SignFiles" $true
 }
