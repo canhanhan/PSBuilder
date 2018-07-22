@@ -34,47 +34,6 @@ Describe "Invoke-Builder" {
                 $Configuration.Keys | Should -Contain "sample_key"
                 $Configuration["sample_key"] | Should -Be "sample_value"
             }
-
-            It "sets default values" {
-                Mock -CommandName "Test-Path" -MockWith { $False }
-                Mock -CommandName "Invoke-psake" -MockWith { $Global:Configuration = $Parameters }
-
-                Invoke-Builder SampleTask
-
-                "IsScript" | Should -BeIn $Configuration.Keys
-                "BuildRoot" | Should -BeIn $Configuration.Keys
-                "BuildOutput" | Should -BeIn $Configuration.Keys
-                "SourcePath" | Should -BeIn $Configuration.Keys
-                "Name" | Should -BeIn $Configuration.Keys
-                "CodeCoverageMin" | Should -BeIn $Configuration.Keys
-                "ManifestDestination" | Should -BeIn $Configuration.Keys
-                "SourceFilePath" | Should -BeIn $Configuration.Keys
-                "MergedFilePath" | Should -BeIn $Configuration.Keys
-                "AnalysisFailureLevel" | Should -BeIn $Configuration.Keys
-                "AnalysisSettingsFile" | Should -BeIn $Configuration.Keys
-                "TestTags" | Should -BeIn $Configuration.Keys
-            }
-
-            It "sets default values for modules" {
-                Mock -CommandName "Test-Path" -MockWith { $False }
-                Mock -CommandName "Invoke-psake" -MockWith { $Global:Configuration = $Parameters }
-
-                Invoke-Builder SampleTask -Configuration @{ IsScript = $false }
-
-                "ManifestDestination" | Should -BeIn $Configuration.Keys
-                "SourceFilePath" | Should -BeIn $Configuration.Keys
-                "MergedFilePath" | Should -BeIn $Configuration.Keys
-            }
-
-            It "sets default values for scripts" {
-                Mock -CommandName "Test-Path" -MockWith { $False }
-                Mock -CommandName "Invoke-psake" -MockWith { $Global:Configuration = $Parameters }
-
-                Invoke-Builder SampleTask -Configuration @{ IsScript = $true }
-
-                "SourceFilePath" | Should -BeIn $Configuration.Keys
-                "MergedFilePath" | Should -BeIn $Configuration.Keys
-            }
         }
 
         Context "PSake failed" {
