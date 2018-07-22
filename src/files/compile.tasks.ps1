@@ -13,7 +13,15 @@ task "CopyFiles" -depends "CreateOutputDir" -requiredVariables "SourcePath" {
     }
 }
 
-task "CompileModule" -precondition { -not $IsScript } -depends "CreateOutputDir", "CopyFiles" -requiredVariables "ManifestDestination" {
+task "CopyLicense" -depends "CreateOutputDir" -requiredVariables "BuildRoot", "BuildOutput" {
+    $LicensePath = Join-Path -Path $BuildRoot -ChildPath "LICENSE"
+    if (Test-Path -Path $LicensePath)
+    {
+        Copy-Item -Path $LicensePath -Destination $BuildOutput
+    }
+}
+
+task "CompileModule" -precondition { -not $IsScript } -depends "CreateOutputDir", "CopyFiles", "CopyLicense" -requiredVariables "ManifestDestination" {
     $publicFolder = Join-Path -Path $SourcePath -ChildPath "Public"
     $publicFunctions = @(Get-ChildItem -Path $publicFolder -Filter "*.ps1" -Recurse).ForEach({ $_.BaseName })
 
