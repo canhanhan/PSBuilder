@@ -1,16 +1,16 @@
 ---
 Module Name: PSBuilder
 Module Guid: 4e489c66-8a1a-11e8-9a94-a6cf71072f73
-Download Help Link: {{Please enter FwLink manually}}
-Help Version: {{Please enter version of help manually (X.X.X.X) format}}
+Download Help Link: https://github.com/finarfin/PSBuilder/tree/master/docs
+Help Version: 1.0.0
 Locale: en-US
 ---
 
 # PSBuilder Module
 ## Description
-{{Manually Enter Description Here}}
+PSBuilder provides re-usable, shared [psake](https://github.com/psake/psake) tasks for building Powershell modules and scripts.
 
 ## PSBuilder Cmdlets
 ### [Invoke-Builder](Invoke-Builder.md)
-{{Manually Enter Invoke-Builder Description Here}}
+Executes build tasks
 

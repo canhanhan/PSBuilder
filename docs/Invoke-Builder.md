@@ -8,7 +8,7 @@ schema: 2.0.0
 # Invoke-Builder
 
 ## SYNOPSIS
-{{Fill in the Synopsis}}
+Executes build tasks
 
 ## SYNTAX
 
