@@ -1,4 +1,4 @@
-task "CreateOutputDir" -requiredVariables "BuildOutput" {
+task "CreateOutputDir" -depends "Clean" -requiredVariables "BuildOutput" {
     if (-not (Test-Path $BuildOutput))
     {
         New-Item -Path $BuildOutput -ItemType Directory | Out-Null
@@ -85,4 +85,4 @@ task "CompileScript" -precondition { $IsScript } -depends "CreateOutputDir", "Cr
 }
 
 task Compile -depends CompileModule, CompileScript
-task Stage -depends Clean, CreateOutputDir, Compile
+task Stage -depends Clean, CreateOutputDir, Compile, Sign

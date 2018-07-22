@@ -1,4 +1,6 @@
+include "$PSScriptRoot/defaults.ps1"
 include "$PSScriptRoot/clean.tasks.ps1"
+include "$PSScriptRoot/sign.tasks.ps1"
 include "$PSScriptRoot/compile.tasks.ps1"
 include "$PSScriptRoot/test.tasks.ps1"
 include "$PSScriptRoot/docs.tasks.ps1"
