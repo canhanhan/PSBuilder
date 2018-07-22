@@ -12,6 +12,7 @@ Properties {
     SetDefault "Name" ([IO.Path]::GetFileName([IO.Path]::GetDirectoryName($BuildRoot + "/")))
     SetDefault "BuildOutput" (Join-Path -Path $BuildRoot -ChildPath "output")
     SetDefault "SourcePath" (Join-Path -Path $BuildRoot -ChildPath "src")
+    SetDefault "DocumentationPath" (Join-Path $BuildOutput -ChildPath "docs")
 
     if ($IsScript)
     {
@@ -29,7 +30,6 @@ Properties {
     SetDefault "AnalysisFailureLevel" "Error"
     SetDefault "AnalysisSettingsFile" ""
     SetDefault "TestTags" @()
-    SetDefault "DocumentationPath" "$PSScriptRoot/docs"
 
     SetDefault "ExtensionsToSign" "*.ps1", "*.psd1", "*.psm1"
     SetDefault "SignFiles" $true
