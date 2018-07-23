@@ -6,7 +6,6 @@ Describe_WithSampleModule "Clean" {
 
         Invoke-Builder Clean
 
-        $psake.build_success | Should -BeTrue
         Test-Path -Path $OutputPath | Should -BeFalse
     }
 }

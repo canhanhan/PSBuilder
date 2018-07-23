@@ -17,7 +17,6 @@ function Invoke-Builder
         [ValidateNotNullOrEmpty()]
         [string[]]$TestTags,
 
-        [switch]$ThrowOnError,
         [switch]$ExitWithCode
     )
 
@@ -41,18 +40,19 @@ function Invoke-Builder
         })
     }
 
-    Invoke-psake -buildFile $buildFile -nologo -parameters $Configuration -taskList $Tasks -OutVariable psakeResult
+    $Configuration["BuildRoot"] = $buildRoot
 
-    if (-not $Psake.build_success)
+    Invoke-psake -buildFile $BuildFile -nologo -parameters $Configuration -taskList $Tasks
+
+    if (-not $psake.build_success)
     {
-        if (-not $ExitWithCode -and $ThrowOnError)
-        {
-            throw $psakeResult
-        }
-
         if ($ExitWithCode)
         {
             Exit-Powershell -ExitCode 1
+        }
+        else
+        {
+            throw "Build Failed"
         }
     }
 }

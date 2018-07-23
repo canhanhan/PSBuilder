@@ -3,7 +3,6 @@
 Describe_WithSampleModule "CreateOutputDir" {
     It "created output directory" {
         Invoke-Builder CreateOutputDir
-        $psake.build_success | Should -BeTrue
 
         Test-Path -Path $OutputPath | Should -BeTrue
     }
@@ -12,7 +11,6 @@ Describe_WithSampleModule "CreateOutputDir" {
 Describe_WithSampleModule "CopyFiles" {
     It "copies files" {
         Invoke-Builder CopyFiles
-        $psake.build_success | Should -BeTrue
 
         Test-Path -Path "$OutputPath/files/sample_file.txt" | Should -BeTrue
         Test-Path -Path "$OutputPath/files/sample_file.ps1" | Should -BeTrue
@@ -24,7 +22,6 @@ Describe_WithSampleModule "Compile" {
     Context "PSM does not exist" {
         It "merges files" {
             Invoke-Builder Compile
-            $psake.build_success | Should -BeTrue
 
             Test-Path -Path "$OutputPath/SampleModule.psm1" | Should -BeTrue
             Test-Path -Path "$OutputPath/Public" | Should -BeFalse
@@ -34,7 +31,6 @@ Describe_WithSampleModule "Compile" {
 
         It "exports public functions" {
             Invoke-Builder Compile
-            $psake.build_success | Should -BeTrue
 
             Import-Module -Name "$OutputPath/SampleModule.psm1"
             Get-Something | Should -Be "Something"
@@ -42,7 +38,6 @@ Describe_WithSampleModule "Compile" {
 
         It "does not export private functions" {
             Invoke-Builder Compile
-            $psake.build_success | Should -BeTrue
 
             Import-Module -Name "$OutputPath/SampleModule.psm1"
             { Get-SomethingElse } | Should -Throw

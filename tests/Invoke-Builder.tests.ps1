@@ -39,12 +39,8 @@ Describe "Invoke-Builder" {
         Context "PSake failed" {
             Mock -CommandName "Invoke-psake" -MockWith { $Global:psake = @{ build_success = $false } }
 
-            It "does not throw on error if flag not set" {
-                { Invoke-Builder SampleTask } | Should -Not -Throw
-            }
-
-            It "throws on error if flag set" {
-                { Invoke-Builder SampleTask -ThrowOnError } | Should -Throw
+            It "throws on error" {
+                { Invoke-Builder SampleTask } | Should -Throw
             }
 
             Context "Exit flag set" {
