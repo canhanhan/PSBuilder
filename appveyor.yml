@@ -12,7 +12,7 @@ install:
       Install-Module psake -Force
       Install-Module PSScriptAnalyzer -Force
       Install-Module platyPS -Force
-      Install-Module PSBuild -Force -AllowPrerelease
+      Install-Module PSBuilder -Force -AllowPrerelease
 
 build_script:
   - ps: |
