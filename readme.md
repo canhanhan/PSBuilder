@@ -1,6 +1,5 @@
-[![Build status][appveyor-badge]][appveyor-build]
-[![PowerShell Gallery][psgallery-badge]][psgallery]
-[![Nuget downloads][nuget-downloads]][nuget]
+[![Build status](https://ci.appveyor.com/api/projects/status/s9gs5px842ypg2b9?svg=true)](https://ci.appveyor.com/project/finarfin/psbuilder)
+[![PowerShell Gallery](https://img.shields.io/powershellgallery/dt/PSBuilder.svg)](https://www.powershellgallery.com/packages/PSBuilder)
 
 # PSBuilder
 
