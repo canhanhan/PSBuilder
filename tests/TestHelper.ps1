@@ -3,15 +3,15 @@ $ErrorActionPreference = "Stop"
 
 function Clone-SampleModule {
     $ModuleSource = "$PSScriptRoot/../examples/SampleModule"
-    $ModulePath = Join-Path -Path $testDrive -ChildPath "SampleModule"
+    $ModuleDestination = Join-Path -Path $testDrive -ChildPath "SampleModule"
 
-    if (Test-Path $ModulePath) { Remove-Item -Path $ModulePath -Recurse -Force }
+    if (Test-Path $ModuleDestination) { Remove-Item -Path $ModuleDestination -Recurse -Force }
     Copy-Item -Path $ModuleSource -Destination $testDrive -Recurse
 
-    Push-Location -Path $ModulePath -StackName "TestPath"
-    $OutputPath = Join-Path -Path $ModulePath -ChildPath "Output"
+    Push-Location -Path $ModuleDestination -StackName "TestPath"
+    $OutputPath = Join-Path -Path $ModuleDestination -ChildPath "Output"
 
-    return $ModulePath, $OutputPath
+    return $ModuleDestination, $OutputPath
 }
 
 function Clean-SampleModule {
@@ -24,11 +24,22 @@ function Test-SampleModulePath {
 
 function Describe_WithSampleModule
 {
-    param ([string]$Name, [scriptblock]$ScriptBlock)
+    param (
+        [Parameter(Mandatory=$true, Position=0)]
+        [string]$Name,
 
-    Describe $Name {
+        [string[]]$Tag=@(),
+
+        [Parameter(Mandatory=$true, Position=1)]
+        [scriptblock]$ScriptBlock
+    )
+
+    Describe $Name -Tag $Tag {
         BeforeAll { Test-SampleModulePath }
-        BeforeEach { $ModulePath, $OutputPath = Clone-SampleModule }
+        BeforeEach {
+            $ModulePath, $OutputPath = Clone-SampleModule
+            Import-Module -Name PSake -Force
+        }
         AfterEach { Clean-SampleModule }
         AfterAll { Test-SampleModulePath }
 
