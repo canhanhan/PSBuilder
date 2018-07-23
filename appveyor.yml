@@ -1,0 +1,20 @@
+os:
+  - "WMF 5"
+
+branches:
+  only:
+    - master
+
+install:
+  - ps: |
+      Install-PackageProvider -Name NuGet -MinimumVersion 4.1.0 -Force | Out-Null
+      Install-Module PowerShellGet -Scope CurrentUser -Force | Out-Null
+      Install-Module Pester -Scope CurrentUser -Force | Out-Null
+      Install-Module psake -Scope CurrentUser -Force | Out-Null
+      Install-Module PSScriptAnalyzer -Scope CurrentUser -Force | Out-Null
+      Install-Module platyPS -Scope CurrentUser -Force | Out-Null
+      Install-Module PSBuild -Scope CurrentUser -Force -AllowPrerelease | Out-Null
+
+build_script:
+  - ps: |
+      Invoke-Builder Stage
