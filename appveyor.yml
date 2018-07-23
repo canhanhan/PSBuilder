@@ -8,7 +8,7 @@ branches:
 install:
   - ps: |
       Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force | Out-Null
-      Install-Module PackageManagement -ScopeCurrentUser -Force -SkipPublisherCheck | Out-Null
+      Install-Module PackageManagement -Scope CurrentUser -Force -SkipPublisherCheck | Out-Null
       Install-Module PowerShellGet -Scope CurrentUser -Force -SkipPublisherCheck | Out-Null
       Install-Module Pester -Scope CurrentUser -Force | Out-Null
       Install-Module psake -Scope CurrentUser -Force | Out-Null
@@ -19,3 +19,6 @@ install:
 build_script:
   - ps: |
       Invoke-Builder Stage
+
+on_finish:
+  - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
