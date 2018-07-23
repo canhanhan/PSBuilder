@@ -1,5 +1,5 @@
-task PublishToRepository -depends Stage {
-    $publishParams = @{ "Path" = $MergedFilePath }
+task PublishToRepository -depends Stage -requiredVariables "BuildOutput" {
+    $publishParams = @{ "Path" = $BuildOutput }
 
     if (Test-Path "Variable:PublishRepository")
     {
