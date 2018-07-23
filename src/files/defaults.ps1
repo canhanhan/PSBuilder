@@ -9,7 +9,7 @@ function SetDefault($VariableName, $Value)
 Properties {
     SetDefault "BuildRoot" (Get-Location).Path
     SetDefault "Name" ([IO.Path]::GetFileName([IO.Path]::GetDirectoryName($BuildRoot + "/")))
-    SetDefault "BuildOutput" (Join-Path -Path $BuildRoot -ChildPath "output")
+    SetDefault "BuildOutput" (Join-Path -Path $BuildRoot -ChildPath "output/$Name")
     SetDefault "SourcePath" (Join-Path -Path $BuildRoot -ChildPath "src")
     SetDefault "DocumentationPath" (Join-Path $BuildOutput -ChildPath "docs")
     SetDefault "SourceFilePath" (Join-Path -Path $SourcePath -ChildPath "$Name.psm1")
