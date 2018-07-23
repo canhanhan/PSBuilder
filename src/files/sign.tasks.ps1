@@ -53,7 +53,7 @@ task "SelectCert" {
     }
 }
 
-task "Sign" -depends "Compile", "SelectCert" -requiredVariables "Certificate", "SignFiles", "MergedFilePath", "BuildOutput", "ExtensionsToSign"  {
+task "Sign" -precondition { $Sign -eq $true } -depends "Compile", "SelectCert" -requiredVariables "Certificate", "SignFiles", "MergedFilePath", "BuildOutput", "ExtensionsToSign"  {
     $filesTarget = Join-Path -Path $buildOutput -ChildPath "files"
     $files = (,$MergedFilePath)
     if ($SignFiles -and (Test-Path -Path $filesTarget))

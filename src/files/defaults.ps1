@@ -22,5 +22,6 @@ Properties {
     SetDefault "TestTags" @()
 
     SetDefault "ExtensionsToSign" "*.ps1", "*.psd1", "*.psm1"
+    SetDefault "Sign" $false
     SetDefault "SignFiles" $true
 }
