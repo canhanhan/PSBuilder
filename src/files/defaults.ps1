@@ -1,8 +1,8 @@
-function SetDefault($Name, $Value)
+function SetDefault($VariableName, $Value)
 {
-    if (-not (Test-Path -Path "Variable:$Name"))
+    if (-not (Test-Path -Path "Variable:$VariableName"))
     {
-        Set-Variable -Name $Name -Value $Value -Scope Script
+        Set-Variable -Name $VariableName -Value $Value -Scope Script
     }
 }
 
