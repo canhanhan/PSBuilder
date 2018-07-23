@@ -19,8 +19,8 @@ task Analyze -requiredVariables "BuildOutput", "AnalysisFailureLevel", "Analysis
 }
 
 task RunPester -requiredVariables "buildRoot", "ManifestDestination", "CodeCoverageMin", "TestTags" {
-    $testResult = Start-Job -ArgumentList ("$BuildRoot\tests", $ManifestDestination, $testTags) -ScriptBlock {
-        param($testPath, $filePath, $tags)
+    $testResult = Start-Job -ArgumentList ("$BuildRoot\tests", $ManifestDestination, $MergedFilePath, $testTags) -ScriptBlock {
+        param($testPath, $manifestFilePath, $moduleFilePath, $tags)
 
         Set-StrictMode -Version Latest
         $ErrorActionPreference = "Stop"
@@ -29,8 +29,8 @@ task RunPester -requiredVariables "buildRoot", "ManifestDestination", "CodeCover
 
         try
         {
-            Import-Module -Name $filePath -Global -Force
-            Invoke-Pester -PassThru -Verbose -CodeCoverage $filePath -Tag $tags
+            Import-Module -Name $manifestFilePath -Global -Force
+            Invoke-Pester -PassThru -Verbose -CodeCoverage $moduleFilePath -Tag $tags
         }
         finally
         {
@@ -40,7 +40,15 @@ task RunPester -requiredVariables "buildRoot", "ManifestDestination", "CodeCover
 
     assert ($testResult.FailedCount -eq 0) ('Failed {0} Unit tests. Aborting Build' -f $testResult.FailedCount)
 
-    $testCoverage = [int]($testResult.CodeCoverage.NumberOfCommandsExecuted / $testResult.CodeCoverage.NumberOfCommandsAnalyzed * 100)
+    if (0 -eq $testResult.CodeCoverage.NumberOfCommandsAnalyzed)
+    {
+        $testCoverage = 0
+    }
+    else
+    {
+        $testCoverage = [int]($testResult.CodeCoverage.NumberOfCommandsExecuted / $testResult.CodeCoverage.NumberOfCommandsAnalyzed * 100)
+    }
+
     "Pester code coverage: ${testCoverage}%"
 
     assert ($CodeCoverageMin -le $testCoverage) ('Code coverage must be higher or equal to {0}%. Current coverage: {1}%' -f ($CodeCoverageMin, $testCoverage))
