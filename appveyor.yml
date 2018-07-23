@@ -7,14 +7,15 @@ branches:
 
 install:
   - ps: |
-      Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force | Out-Null
-      Install-Module PackageManagement -Scope CurrentUser -Force -SkipPublisherCheck | Out-Null
-      Install-Module PowerShellGet -Scope CurrentUser -Force -SkipPublisherCheck | Out-Null
-      Install-Module Pester -Scope CurrentUser -Force | Out-Null
-      Install-Module psake -Scope CurrentUser -Force | Out-Null
-      Install-Module PSScriptAnalyzer -Scope CurrentUser -Force | Out-Null
-      Install-Module platyPS -Scope CurrentUser -Force | Out-Null
-      Install-Module PSBuild -Scope CurrentUser -Force -AllowPrerelease | Out-Null
+      Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
+      PowerShell -command {Install-Module -Name PowershellGet,PackageManagement -force -confirm:$false -verbose)
+
+  - ps: |
+      Install-Module Pester -Force
+      Install-Module psake -Force
+      Install-Module PSScriptAnalyzer -Force
+      Install-Module platyPS -Force
+      Install-Module PSBuild -Force -AllowPrerelease
 
 build_script:
   - ps: |
