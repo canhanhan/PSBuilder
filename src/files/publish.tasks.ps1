@@ -6,7 +6,7 @@ task PublishToRepository -depends Stage {
         $publishParams["Repository"] = $PublishRepository
     }
 
-    $nugetApiKey = Get-NugetApiKey
+    $nugetApiKey = $Env:NugetCredential
     if ($null -ne $nugetApiKey)
     {
         $publishParams["NuGetApiKey"] = $nugetApiKey
