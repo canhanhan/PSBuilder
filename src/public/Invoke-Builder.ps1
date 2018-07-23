@@ -19,7 +19,7 @@ function Invoke-Builder
 
     if (-not $psake.build_success)
     {
-        if ($ExitWithCode)
+        if ($ExitOnError)
         {
             Exit-Powershell -ExitCode 1
         }
