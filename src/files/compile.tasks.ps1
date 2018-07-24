@@ -72,7 +72,7 @@ task "CompileModule" `
 
     if ($publicFunctions.Count -gt 0)
     {
-        [void]$builder.AppendLine("Export-ModuleMember -Function (, $($publicFunctions.ForEach({ "'$_'" }) -join ", "))")
+        [void]$builder.AppendLine("Export-ModuleMember -Function @($($publicFunctions.ForEach({ "'$_'" }) -join ", "))")
     }
 
     Set-Content -Path $MergedFilePath -Value ($builder.ToString()) -Force
@@ -88,5 +88,5 @@ task "CopyManifest" `
 }
 
 task "Compile" `
-    -depends "Clean", "CreateOutputDir", "CopyFiles", "CopyLicense", "CopyManifest", "CompileModule", "Sign"
+    -depends "Clean", "CreateOutputDir", "CopyFiles", "CopyLicense", "CopyManifest", "CompileModule", "Sign" `
     -description "Compiles and signs the module"
