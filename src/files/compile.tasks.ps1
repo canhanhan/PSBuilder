@@ -1,32 +1,50 @@
-task "Clean" -requiredVariables "BuildOutput" {
+task "Clean" `
+    -requiredVariables "BuildOutput" `
+    -description "Removes output from previous builds" `
+{
     if (Test-Path -Path $BuildOutput)
     {
         Remove-Item -Path $BuildOutput -Force -Recurse
     }
 }
 
-task "CreateOutputDir" -requiredVariables "BuildOutput" {
+task "CreateOutputDir" `
+    -requiredVariables "BuildOutput" `
+    -description "Creates a blank output directory" `
+{
     if (-not (Test-Path -Path $BuildOutput))
     {
         New-Item -Path $BuildOutput -ItemType Directory -Force | Out-Null
     }
 }
 
-task "CopyFiles" -depends "CreateOutputDir" -requiredVariables "BuildOutput", "FilesPath" {
+task "CopyFiles" `
+    -depends "CreateOutputDir" `
+    -requiredVariables "BuildOutput", "FilesPath" `
+    -description "Copies extra files to output" `
+{
     if (Test-Path -Path $FilesPath)
     {
         Copy-Item -Path $FilesPath -Destination $BuildOutput -Recurse -Container -Force
     }
 }
 
-task "CopyLicense" -depends "CreateOutputDir" -requiredVariables "BuildOutput", "LicensePath" {
+task "CopyLicense" `
+    -depends "CreateOutputDir" `
+    -requiredVariables "BuildOutput", "LicensePath" `
+    -description "Copy license file to output" `
+{
     if (Test-Path -Path $LicensePath)
     {
         Copy-Item -Path $LicensePath -Destination $BuildOutput -Force
     }
 }
 
-task "CompileModule" -depends "CreateOutputDir" -requiredVariables "SourcePath", "MergedFilePath" {
+task "CompileModule" `
+    -depends "CreateOutputDir" `
+    -requiredVariables "SourcePath", "MergedFilePath" `
+    -description "Compiles Powershell files into a module file" `
+{
     $publicFolder = Join-Path -Path $SourcePath -ChildPath "Public"
     $publicFunctions = @(Get-ChildItem -Path $publicFolder -Filter "*.ps1" -Recurse).ForEach({ $_.BaseName })
 
@@ -60,10 +78,15 @@ task "CompileModule" -depends "CreateOutputDir" -requiredVariables "SourcePath",
     Set-Content -Path $MergedFilePath -Value ($builder.ToString()) -Force
 }
 
-task "CopyManifest" -requiredVariables "Name", "SourcePath", "ManifestDestination" {
+task "CopyManifest" `
+    -depends "CreateOutputDir" `
+    -requiredVariables "Name", "SourcePath", "ManifestDestination" `
+    -description "Copies manifest file to output" `
+{
     $ManifestFilePath = Join-Path -Path $SourcePath -ChildPath "$Name.psd1"
     Copy-Item -Path $ManifestFilePath -Destination $ManifestDestination
 }
 
-task "Compile" -depends "CreateOutputDir", "CopyFiles", "CopyLicense", "CopyManifest", "CompileModule"
-task "Stage" -depends "Clean", "CreateOutputDir", "Compile", "Sign"
+task "Compile" `
+    -depends "Clean", "CreateOutputDir", "CopyFiles", "CopyLicense", "CopyManifest", "CompileModule", "Sign"
+    -description "Compiles and signs the module"
