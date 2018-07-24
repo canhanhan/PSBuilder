@@ -1,4 +1,8 @@
-task PublishToRepository -depends Stage -requiredVariables "BuildOutput" {
+task "PublishToRepository" `
+     -depends "Compile" `
+     -requiredVariables "BuildOutput" `
+     -description "Publishes module to a Powershell Repository" `
+{
     $publishParams = @{ "Path" = $BuildOutput }
 
     if (Test-Path "Variable:PublishRepository")
@@ -16,4 +20,6 @@ task PublishToRepository -depends Stage -requiredVariables "BuildOutput" {
 }
 
 
-task Publish -depends Clean, Stage, Test, PublishToRepository
+task "Publish" `
+    -depends "Clean", "Compile", "Test", "PublishToRepository" `
+    -description "Published module"
