@@ -12,22 +12,8 @@ Executes build tasks
 
 ## SYNTAX
 
-### Default (Default)
 ```
-Invoke-Builder [[-Tasks] <String[]>] [-TestTags <String[]>] [-ThrowOnError] [-ExitWithCode]
- [<CommonParameters>]
-```
-
-### UseFile
-```
-Invoke-Builder [[-Tasks] <String[]>] -ConfigurationFile <String> [-TestTags <String[]>] [-ThrowOnError]
- [-ExitWithCode] [<CommonParameters>]
-```
-
-### UseHashtable
-```
-Invoke-Builder [[-Tasks] <String[]>] -Configuration <Hashtable> [-TestTags <String[]>] [-ThrowOnError]
- [-ExitWithCode] [<CommonParameters>]
+Invoke-Builder [[-Tasks] <String[]>] [-TestTags <String[]>] [-ExitOnError] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -44,38 +30,8 @@ PS C:\> {{ Add example code here }}
 
 ## PARAMETERS
 
-### -Configuration
-{{Fill Configuration Description}}
-
-```yaml
-Type: Hashtable
-Parameter Sets: UseHashtable
-Aliases:
-
-Required: True
-Position: Named
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-### -ConfigurationFile
-{{Fill ConfigurationFile Description}}
-
-```yaml
-Type: String
-Parameter Sets: UseFile
-Aliases:
-
-Required: True
-Position: Named
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-### -ExitWithCode
-{{Fill ExitWithCode Description}}
+### -ExitOnError
+{{Fill ExitOnError Description}}
 
 ```yaml
 Type: SwitchParameter
@@ -109,21 +65,6 @@ Accept wildcard characters: False
 
 ```yaml
 Type: String[]
-Parameter Sets: (All)
-Aliases:
-
-Required: False
-Position: Named
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-### -ThrowOnError
-{{Fill ThrowOnError Description}}
-
-```yaml
-Type: SwitchParameter
 Parameter Sets: (All)
 Aliases:
 
