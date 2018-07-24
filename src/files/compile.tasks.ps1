@@ -4,7 +4,7 @@ task "Clean" `
 {
     if (Test-Path -Path $BuildOutput)
     {
-        Remove-Item -Path $BuildOutput -Force -Recurse
+        Remove-Item -Path $BuildOutput -Recurse -Force
     }
 }
 
