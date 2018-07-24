@@ -11,7 +11,7 @@ Properties {
     SetDefault "Name" ([IO.Path]::GetFileName([IO.Path]::GetDirectoryName($BuildRoot + "/")))
     SetDefault "BuildOutput" (Join-Path -Path $BuildRoot -ChildPath "output/$Name")
     SetDefault "SourcePath" (Join-Path -Path $BuildRoot -ChildPath "src")
-    SetDefault "DocumentationPath" (Join-Path $BuildOutput -ChildPath "docs")
+    SetDefault "DocumentationPath" (Join-Path $BuildRoot -ChildPath "docs")
     SetDefault "FilesPath" (Join-Path -Path $SourcePath -ChildPath "files")
     SetDefault "LicensePath" (Join-Path -Path $BuildRoot -ChildPath "LICENSE")
     SetDefault "SourceFilePath" (Join-Path -Path $SourcePath -ChildPath "$Name.psm1")
