@@ -1,4 +1,8 @@
-task "GenerateDocs" -depends "Compile" -requiredVariables "Name", "ManifestDestination", "DocumentationPath" {
+task "GenerateDocs" `
+    -depends "Compile" `
+    -requiredVariables "Name", "ManifestDestination", "DocumentationPath" `
+    -description "Generates platyPS Markdown" `
+{
     Start-Job -ScriptBlock {
         Set-StrictMode -Version Latest
         $ErrorActionPreference = "Stop"
@@ -20,7 +24,11 @@ task "GenerateDocs" -depends "Compile" -requiredVariables "Name", "ManifestDesti
     } | Receive-Job -Wait -AutoRemoveJob
 }
 
-task "BuildDocs" -depends "GenerateDocs" -requiredVariables "BuildOutput", "DocumentationPath" {
+task "BuildDocs" `
+    -depends "GenerateDocs" `
+    -requiredVariables "BuildOutput", "DocumentationPath" `
+    -description "Build Powershell help file using platyPS markdown"
+{
     $destination = Join-Path -Path $BuildOutput -ChildPath "en-US"
     New-ExternalHelp -Path $DocumentationPath -OutputPath $destination | Out-Null
 }
