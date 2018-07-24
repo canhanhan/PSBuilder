@@ -1,21 +1,22 @@
-task "GenerateDocs" -depends "Stage" -requiredVariables "Name", "ManifestDestination", "DocumentationPath" {
-    Start-Job -ArgumentList ($name, $ManifestDestination, $documentationPath) -ScriptBlock {
-        param($name, $filePath, $docPath)
-
+task "GenerateDocs" -depends "Compile" -requiredVariables "Name", "ManifestDestination", "DocumentationPath" {
+    Start-Job -ScriptBlock {
         Set-StrictMode -Version Latest
         $ErrorActionPreference = "Stop"
 
-        $module = Import-Module -Name $filePath -Global -Force -PassThru
+        Import-Module -Name $using:ManifestDestination -Global -Force
 
-        if (-not (Test-Path -Path $docPath)) { New-Item -Path $docPath -ItemType Directory -Force | Out-Null }
-
-        New-MarkdownHelp -Module $name -OutputFolder $docPath -WithModulePage -Force | Out-Null
-
-        foreach ($function in $module.ExportedFunctions.Keys)
+        if (-not (Test-Path -Path $using:DocumentationPath))
         {
-            $doc = Join-Path -Path $docPath -ChildPath "$($function).md"
-            Update-MarkdownHelp -Path $doc | Out-Null
+            New-Item -Path $using:DocumentationPath -ItemType Directory -Force | Out-Null
         }
+
+        $moduleFile = Join-Path -Path $using:DocumentationPath -ChildPath "$($using:Name).md"
+        if (-not (Test-Path -Path $moduleFile))
+        {
+            New-MarkdownHelp -Module $using:Name -OutputFolder $using:DocumentationPath -WithModulePage | Out-Null
+        }
+
+        Update-MarkdownHelpModule -Path $using:DocumentationPath -RefreshModulePage | Out-Null
     } | Receive-Job -Wait -AutoRemoveJob
 }
 
