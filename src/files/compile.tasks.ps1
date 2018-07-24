@@ -1,34 +1,32 @@
 task "Clean" -requiredVariables "BuildOutput" {
-    if (Test-Path $BuildOutput)
+    if (Test-Path -Path $BuildOutput)
     {
         Remove-Item -Path $BuildOutput -Force -Recurse
     }
 }
 
-task "CreateOutputDir" -depends "Clean" -requiredVariables "BuildOutput" {
-    if (-not (Test-Path $BuildOutput))
+task "CreateOutputDir" -requiredVariables "BuildOutput" {
+    if (-not (Test-Path -Path $BuildOutput))
     {
-        New-Item -Path $BuildOutput -ItemType Directory | Out-Null
+        New-Item -Path $BuildOutput -ItemType Directory -Force | Out-Null
     }
 }
 
-task "CopyFiles" -depends "CreateOutputDir" -requiredVariables "SourcePath" {
-    $FilesPath = Join-Path -Path $SourcePath -ChildPath "files"
+task "CopyFiles" -depends "CreateOutputDir" -requiredVariables "BuildOutput", "FilesPath" {
     if (Test-Path -Path $FilesPath)
     {
-        Copy-Item -Path $FilesPath -Destination $BuildOutput -Recurse -Container
+        Copy-Item -Path $FilesPath -Destination $BuildOutput -Recurse -Container -Force
     }
 }
 
-task "CopyLicense" -depends "CreateOutputDir" -requiredVariables "BuildRoot", "BuildOutput" {
-    $LicensePath = Join-Path -Path $BuildRoot -ChildPath "LICENSE"
+task "CopyLicense" -depends "CreateOutputDir" -requiredVariables "BuildOutput", "LicensePath" {
     if (Test-Path -Path $LicensePath)
     {
-        Copy-Item -Path $LicensePath -Destination $BuildOutput
+        Copy-Item -Path $LicensePath -Destination $BuildOutput -Force
     }
 }
 
-task "CompileModule" -depends "CreateOutputDir", "CopyFiles", "CopyLicense" -requiredVariables "ManifestDestination" {
+task "CompileModule" -depends "CreateOutputDir" -requiredVariables "SourcePath", "MergedFilePath" {
     $publicFolder = Join-Path -Path $SourcePath -ChildPath "Public"
     $publicFunctions = @(Get-ChildItem -Path $publicFolder -Filter "*.ps1" -Recurse).ForEach({ $_.BaseName })
 
@@ -60,10 +58,12 @@ task "CompileModule" -depends "CreateOutputDir", "CopyFiles", "CopyLicense" -req
     }
 
     Set-Content -Path $MergedFilePath -Value ($builder.ToString()) -Force
+}
 
+task "CopyManifest" -requiredVariables "Name", "SourcePath", "ManifestDestination" {
     $ManifestFilePath = Join-Path -Path $SourcePath -ChildPath "$Name.psd1"
     Copy-Item -Path $ManifestFilePath -Destination $ManifestDestination
 }
 
-task Compile -depends CompileModule
-task Stage -depends Clean, CreateOutputDir, Compile, Sign
+task "Compile" -depends "CreateOutputDir", "CopyFiles", "CopyLicense", "CopyManifest", "CompileModule"
+task "Stage" -depends "Clean", "CreateOutputDir", "Compile", "Sign"

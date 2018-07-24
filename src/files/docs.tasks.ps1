@@ -1,4 +1,4 @@
-task GenerateDocs -depends Stage -requiredVariables "Name", "ManifestDestination", "DocumentationPath" {
+task "GenerateDocs" -depends "Stage" -requiredVariables "Name", "ManifestDestination", "DocumentationPath" {
     Start-Job -ArgumentList ($name, $ManifestDestination, $documentationPath) -ScriptBlock {
         param($name, $filePath, $docPath)
 
