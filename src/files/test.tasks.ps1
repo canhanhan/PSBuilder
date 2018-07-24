@@ -1,4 +1,8 @@
-task Analyze -requiredVariables "BuildOutput", "AnalysisFailureLevel", "AnalysisSettingsFile" {
+task "Analyze" `
+    -depends "Compile" `
+    -requiredVariables "BuildOutput", "AnalysisFailureLevel", "AnalysisSettingsFile" `
+    -description "Invokes PSScriptAnalyzer for code analysis" `
+{
     $analysisParameters = @{ "Path"= $BuildOutput }
     if (-not [string]::IsNullOrEmpty($AnalysisSettingsFile)) { $analysisParameters["Settings"] = $AnalysisSettingsFile }
     $analysisResult = Invoke-ScriptAnalyzer @analysisParameters -Recurse
@@ -18,7 +22,11 @@ task Analyze -requiredVariables "BuildOutput", "AnalysisFailureLevel", "Analysis
     }
 }
 
-task RunPester -requiredVariables "buildRoot", "ManifestDestination", "CodeCoverageMin", "TestTags" {
+task "RunPester" `
+    -depends "Compile" `
+    -requiredVariables "buildRoot", "ManifestDestination", "CodeCoverageMin", "TestTags" `
+    -description "Executes Pester tests" `
+{
     $testResult = Start-Job -ArgumentList ("$BuildRoot\tests", $ManifestDestination, $MergedFilePath, $testTags) -ScriptBlock {
         param($testPath, $manifestFilePath, $moduleFilePath, $tags)
 
@@ -54,4 +62,6 @@ task RunPester -requiredVariables "buildRoot", "ManifestDestination", "CodeCover
     assert ($CodeCoverageMin -le $testCoverage) ('Code coverage must be higher or equal to {0}%. Current coverage: {1}%' -f ($CodeCoverageMin, $testCoverage))
 }
 
-task Test -depends Stage, Analyze, RunPester
+task Test `
+    -depends "Compile", "Analyze", "RunPester" `
+    -description "Runs code analysis and tests"
