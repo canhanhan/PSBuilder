@@ -2,7 +2,7 @@
 
 Describe_WithSampleModule "Clean" {
     It "removes output directory" {
-        New-Item -Path $OutputPath -ItemType Directory
+        New-Item -Path $OutputPath -ItemType Directory -Force
 
         Invoke-Builder Clean
 

@@ -9,7 +9,7 @@ function Clone-SampleModule {
     Copy-Item -Path $ModuleSource -Destination $testDrive -Recurse
 
     Push-Location -Path $ModuleDestination -StackName "TestPath"
-    $OutputPath = Join-Path -Path $ModuleDestination -ChildPath "Output"
+    $OutputPath = Join-Path -Path $ModuleDestination -ChildPath "Output/SampleModule"
 
     return $ModuleDestination, $OutputPath
 }
