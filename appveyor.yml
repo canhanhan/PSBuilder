@@ -16,7 +16,7 @@ install:
 
 build_script:
   - ps: |
-      Invoke-Builder Stage
+      Invoke-Builder Publish
 
 on_failure:
   - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
