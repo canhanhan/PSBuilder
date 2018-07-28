@@ -1,6 +1,4 @@
-task "GenerateCert" `
-    -description "Generates a self-signed code signing certificate" `
-{
+Task "GenerateCert" {
     $AvailableCerts = @(Get-ChildItem -Path "Cert:\CurrentUser" -CodeSigningCert -Recurse).Where({ $_.Subject -eq "CN=Test Code Signing Certificate" -and (Test-Certificate -AllowUntrustedRoot -Cert $_) })
     $Certificate = $AvailableCerts | Sort-Object -Descending -Property NotAfter | Select-Object -First 1
 
@@ -36,7 +34,7 @@ task "GenerateCert" `
     }
 }
 
-task "SelectCert" {
+Task "SelectCert" {
     $Certificates = @(Get-ChildItem -Path "Cert:\CurrentUser" -CodeSigningCert -Recurse)
 
     if (Test-Path -Path "Variable:CertificateThumbprint")
@@ -55,12 +53,9 @@ task "SelectCert" {
     }
 }
 
-task "Sign" `
-    -precondition { $Sign -eq $true } `
-    -depends "Compile", "SelectCert" `
-    -requiredVariables "Certificate", "SignFiles", "MergedFilePath", "BuildOutput", "ExtensionsToSign" `
-    -description "Signs module code and code files" `
-{
+Task "Sign" -If { $Sign -eq $true } "Compile", "SelectCert", {
+    Requires "Certificate", "SignFiles", "MergedFilePath", "BuildOutput", "ExtensionsToSign"
+
     $filesTarget = Join-Path -Path $buildOutput -ChildPath "files"
     $files = (,$MergedFilePath)
     if ($SignFiles -and (Test-Path -Path $filesTarget))

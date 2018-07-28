@@ -1,29 +1,20 @@
-function SetDefault($VariableName, $Value)
-{
-    if (-not (Test-Path -Path "Variable:$VariableName"))
-    {
-        Set-Variable -Name $VariableName -Value $Value -Scope Script
-    }
-}
+$Name = [IO.Path]::GetFileName([IO.Path]::GetDirectoryName($BuildRoot + "/"))
+$ProjectBuildFile = Join-Path -Path $BuildRoot -ChildPath "build.ps1"
+$BuildOutput = Join-Path -Path $BuildRoot -ChildPath "output/$Name"
 
-Properties {
-    SetDefault "BuildRoot" (Get-Location).Path
-    SetDefault "Name" ([IO.Path]::GetFileName([IO.Path]::GetDirectoryName($BuildRoot + "/")))
-    SetDefault "BuildOutput" (Join-Path -Path $BuildRoot -ChildPath "output/$Name")
-    SetDefault "SourcePath" (Join-Path -Path $BuildRoot -ChildPath "src")
-    SetDefault "DocumentationPath" (Join-Path $BuildRoot -ChildPath "docs")
-    SetDefault "FilesPath" (Join-Path -Path $SourcePath -ChildPath "files")
-    SetDefault "LicensePath" (Join-Path -Path $BuildRoot -ChildPath "LICENSE")
-    SetDefault "SourceFilePath" (Join-Path -Path $SourcePath -ChildPath "$Name.psm1")
-    SetDefault "ManifestDestination" (Join-Path -Path $BuildOutput -ChildPath "$Name.psd1")
-    SetDefault "MergedFilePath" (Join-Path -Path $BuildOutput -ChildPath "$Name.psm1")
+$SourcePath = Join-Path -Path $BuildRoot -ChildPath "src"
+$DocumentationPath = Join-Path $BuildRoot -ChildPath "docs"
+$FilesPath = Join-Path -Path $SourcePath -ChildPath "files"
+$LicensePath = Join-Path -Path $BuildRoot -ChildPath "LICENSE"
+$SourceFilePath = Join-Path -Path $SourcePath -ChildPath "$Name.psm1"
+$ManifestDestination = Join-Path -Path $BuildOutput -ChildPath "$Name.psd1"
+$MergedFilePath = Join-Path -Path $BuildOutput -ChildPath "$Name.psm1"
 
-    SetDefault "CodeCoverageMin" 0
-    SetDefault "AnalysisFailureLevel" "Error"
-    SetDefault "AnalysisSettingsFile" ""
-    SetDefault "TestTags" @()
+$CodeCoverageMin = 0
+$AnalysisFailureLevel = "Error"
+$AnalysisSettingsFile = Join-Path -Path $BuildRoot -ChildPath "PSScriptAnalyzerSettings.psd1"
+$TestTags = @("*")
 
-    SetDefault "ExtensionsToSign" "*.ps1", "*.psd1", "*.psm1"
-    SetDefault "Sign" $false
-    SetDefault "SignFiles" $true
-}
+$ExtensionsToSign = "*.ps1", "*.psd1", "*.psm1"
+$Sign = $false
+$SignFiles = $true

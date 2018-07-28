@@ -1,8 +1,6 @@
-task "Analyze" `
-    -depends "Compile" `
-    -requiredVariables "BuildOutput", "AnalysisFailureLevel", "AnalysisSettingsFile" `
-    -description "Invokes PSScriptAnalyzer for code analysis" `
-{
+Task "Analyze" "Compile", {
+    Requires "BuildOutput", "AnalysisFailureLevel", "AnalysisSettingsFile"
+
     $analysisParameters = @{ "Path"= $BuildOutput }
     if (-not [string]::IsNullOrEmpty($AnalysisSettingsFile)) { $analysisParameters["Settings"] = $AnalysisSettingsFile }
     $analysisResult = Invoke-ScriptAnalyzer @analysisParameters -Recurse
@@ -14,19 +12,17 @@ task "Analyze" `
 
     if ($AnalysisFailureLevel -eq "Warning")
     {
-        Assert -conditionToCheck ($warnings -eq 0 -and $errors -eq 0) -failureMessage "Build failed due to warnings or errors found in analysis."
+        Assert ($warnings -eq 0 -and $errors -eq 0) "Build failed due to warnings or errors found in analysis."
     }
     elseif ($AnalysisFailureLevel -eq "Error")
     {
-        Assert -conditionToCheck ($errors -eq 0) -failureMessage "Build failed due to errors found in analysis."
+        Assert ($errors -eq 0) "Build failed due to errors found in analysis."
     }
 }
 
-task "RunPester" `
-    -depends "Compile" `
-    -requiredVariables "buildRoot", "ManifestDestination", "CodeCoverageMin", "TestTags" `
-    -description "Executes Pester tests" `
-{
+task "RunPester" "Compile", {
+    Requires "BuildRoot", "ManifestDestination", "CodeCoverageMin", "TestTags"
+
     $testResult = Start-Job -ArgumentList ("$BuildRoot\tests", $ManifestDestination, $MergedFilePath, $testTags) -ScriptBlock {
         param($testPath, $manifestFilePath, $moduleFilePath, $tags)
 
@@ -62,6 +58,4 @@ task "RunPester" `
     assert ($CodeCoverageMin -le $testCoverage) ('Code coverage must be higher or equal to {0}%. Current coverage: {1}%' -f ($CodeCoverageMin, $testCoverage))
 }
 
-task Test `
-    -depends "Compile", "Analyze", "RunPester" `
-    -description "Runs code analysis and tests"
+task Test "Compile", "Analyze", "RunPester"

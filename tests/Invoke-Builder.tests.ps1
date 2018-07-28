@@ -1,7 +1,7 @@
 Describe "Invoke-Builder" {
     InModuleScope -ModuleName "PSBuilder" {
-        Context "PSake failed" {
-            Mock -CommandName "Invoke-psake" -MockWith { $Global:psake = @{ build_success = $false } }
+        Context "Build failed" {
+            Mock -CommandName "Invoke-Build" -MockWith { $Global:Result = @{ Errors = @("SAMPLE ERROR") } }
 
             It "throws on error" {
                 { Invoke-Builder SampleTask } | Should -Throw

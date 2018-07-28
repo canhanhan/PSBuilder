@@ -1,4 +1,13 @@
-function Invoke-Builder
+Set-StrictMode -Version Latest
+$ErrorActionPreference = "Stop"
+
+function Exit-Powershell {
+    param ([int]$ExitCode=0)
+
+    exit $ExitCode
+ }
+
+ function Invoke-Builder
 {
     [CmdletBinding(DefaultParameterSetName="Default")]
     param (
@@ -15,9 +24,9 @@ function Invoke-Builder
     $buildRoot = (Get-Location).Path
     $buildFile = "$PSScriptRoot/files/build.tasks.ps1"
 
-    Invoke-psake -buildFile $BuildFile -nologo -parameters @{ "BuildRoot" = $buildRoot } -taskList $Tasks
+    Invoke-Build -Task $Tasks -File $BuildFile -Result "result" -BuildRoot $buildRoot
 
-    if (-not $psake.build_success)
+    if ($result.Errors.Count -gt 0)
     {
         if ($ExitOnError)
         {
@@ -29,3 +38,5 @@ function Invoke-Builder
         }
     }
 }
+
+Export-ModuleMember -Function "Invoke-Builder"
