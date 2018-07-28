@@ -78,8 +78,18 @@ Task "CompileModule" "CreateOutputDir", {
     }
 }
 
-Task "CreateManifest" "CreateOutputDir", {
-    Requires "Name", "Guid", "Author", "Description", "ManifestDestination"
+Task "CreateManifest" "CompileModule", {
+    Requires "Name", "Guid", "Author", "Description", "ManifestDestination", "MergedFilePath"
+
+    $Exports = Start-Job {
+        $module = Import-Module -Name $using:MergedFilePath -PassThru
+        @{
+            "Aliases" = $module.ExportedAliases.Keys
+            "Cmdlets" = $module.ExportedCmdlets.Keys
+            "Functions" = $module.ExportedFunctions.Keys
+            "Variables" = $module.ExportedVariables.Keys
+        }
+    } | Receive-Job -Wait -AutoRemoveJob
 
     $ManifestArguments = @{
         "RootModule" = "$Name.psm1"
@@ -87,9 +97,13 @@ Task "CreateManifest" "CreateOutputDir", {
         "Author" = $Author
         "Description" = $Description
         "Copyright" = "(c) $((Get-Date).Year) $Author. All rights reserved."
+        "AliasesToExport" = $Exports.Aliases
+        "CmdletsToExport" = $Exports.Cmdlets
+        "FunctionsToExport" = $Exports.Functions
+        "VariablesToExport" = $Exports.Variables
     }
 
     New-ModuleManifest -Path $ManifestDestination @ManifestArguments
 }
 
-Task "Compile" "Clean", "CreateOutputDir", "CopyFiles", "CopyLicense", "CreateManifest", "CompileModule"
+Task "Compile" "Clean", "CreateOutputDir", "CopyFiles", "CopyLicense", "CompileModule", "CreateManifest"
