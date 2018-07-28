@@ -12,11 +12,11 @@ install:
       Install-Module InvokeBuild -Force
       Install-Module PSScriptAnalyzer -Force
       Install-Module platyPS -Force
-      Install-Module PSBuilder -Force -AllowPrerelease
 
 build_script:
   - ps: |
-      Invoke-Builder Publish
+       Import-module .\src\PSBuilder.psm1
+       Invoke-Builder Publish
 
 on_failure:
   - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
