@@ -63,6 +63,7 @@ Task "CompileModule" "CreateOutputDir", {
                 $content = Get-Content -Path $file.FullName -Raw
                 [void]$builder.AppendLine("")
                 [void]$builder.AppendLine("##### BEGIN $($file.Name) #####")
+                [void]$builder.AppendLine("#.ExternalHelp $Name-Help.xml")
                 [void]$builder.AppendLine($content)
                 [void]$builder.AppendLine("##### END $($file.Name) #####")
                 [void]$builder.AppendLine("")

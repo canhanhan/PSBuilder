@@ -7,6 +7,7 @@ function Exit-Powershell {
     exit $ExitCode
  }
 
+ #.ExternalHelp PSBuilder-Help.xml
  function Invoke-Builder
 {
     [CmdletBinding(DefaultParameterSetName="Default")]

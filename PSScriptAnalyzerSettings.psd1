@@ -1,3 +1,0 @@
-@{
-    ExcludeRules=@('PSUseDeclaredVarsMoreThanAssignment')
-}
