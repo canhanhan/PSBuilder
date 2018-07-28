@@ -12,4 +12,4 @@ param (
 . (Join-Path -Path $PSScriptRoot -ChildPath "defaults.ps1")
 if (Test-Path -Path $ProjectBuildFile) { . $ProjectBuildFile }
 
-Task "." "Compile", "Sign", "BuildDocs", "Test"
+Task "Build" "Compile", "Sign", "BuildDocs", "Test"

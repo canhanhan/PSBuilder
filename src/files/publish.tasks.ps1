@@ -17,4 +17,4 @@ Task "PublishToRepository" "Compile", {
     Publish-Module @publishParams
 }
 
-Task "Publish" "Clean", "Compile", "Test", "PublishToRepository"
+Task "Publish" "Build", "PublishToRepository"
