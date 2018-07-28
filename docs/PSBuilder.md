@@ -8,7 +8,7 @@ Locale: en-US
 
 # PSBuilder Module
 ## Description
-PSBuilder provides re-usable, shared [psake](https://github.com/psake/psake) tasks for building Powershell modules and scripts.
+PSBuilder provides re-usable, shared build tasks for building Powershell modules and scripts.
 
 ## PSBuilder Cmdlets
 ### [Invoke-Builder](Invoke-Builder.md)

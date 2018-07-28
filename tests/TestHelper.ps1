@@ -38,7 +38,7 @@ function Describe_WithSampleModule
         BeforeAll { Test-SampleModulePath }
         BeforeEach {
             $ModulePath, $OutputPath = Clone-SampleModule
-            Import-Module -Name PSake -Force
+            Import-Module -Name InvokeBuild -Force
         }
         AfterEach { Clean-SampleModule }
         AfterAll { Test-SampleModulePath }

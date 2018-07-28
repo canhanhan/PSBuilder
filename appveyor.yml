@@ -9,7 +9,7 @@ install:
   - ps: PowerShell -command "Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force | Out-Null; Install-Module PowershellGet -SkipPublisherCheck -Force; Install-Module PackageManagement -SkipPublisherCheck -Force"
   - ps: |
       Install-Module Pester -Force
-      Install-Module psake -Force
+      Install-Module InvokeBuild -Force
       Install-Module PSScriptAnalyzer -Force
       Install-Module platyPS -Force
       Install-Module PSBuilder -Force -AllowPrerelease
