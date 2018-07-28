@@ -2,12 +2,12 @@ Task "Analyze" "Compile", {
     Requires "BuildOutput", "AnalysisFailureLevel", "AnalysisSettingsFile"
 
     $analysisParameters = @{ "Path"= $BuildOutput }
-    if (-not [string]::IsNullOrEmpty($AnalysisSettingsFile)) { $analysisParameters["Settings"] = $AnalysisSettingsFile }
+    if (-not [string]::IsNullOrEmpty($AnalysisSettingsFile) -and (Test-Path -Path $AnalysisSettingsFile)) { $analysisParameters["Settings"] = $AnalysisSettingsFile }
     $analysisResult = Invoke-ScriptAnalyzer @analysisParameters -Recurse
     $analysisResult | Format-Table
 
-    $warnings = $analysisResult.Where({ $_.Severity -eq "Warning" -or $_.Severy -eq "Warning" }).Count
-    $errors = $analysisResult.Where({ $_.Severy -eq "Error" }).Count
+    $warnings = $analysisResult.Where({ $_.Severity -eq "Warning" -or $_.Severity -eq "Warning" }).Count
+    $errors = $analysisResult.Where({ $_.Severity -eq "Error" }).Count
     "Script analyzer triggered {0} warnings and {1} errors" -f $warnings, $errors
 
     if ($AnalysisFailureLevel -eq "Warning")
