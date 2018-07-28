@@ -12,7 +12,7 @@ function Exit-Powershell {
     [CmdletBinding(DefaultParameterSetName="Default")]
     param (
         [Parameter(Position=0, ValueFromRemainingArguments=$true)]
-        [string[]]$Tasks = (, "default"),
+        [string[]]$Tasks,
 
         [Parameter(Mandatory=$false)]
         [ValidateNotNullOrEmpty()]
@@ -24,9 +24,11 @@ function Exit-Powershell {
     $buildRoot = (Get-Location).Path
     $buildFile = "$PSScriptRoot/files/build.tasks.ps1"
 
-    Invoke-Build -Task $Tasks -File $BuildFile -Result "result" -BuildRoot $buildRoot
-
-    if ($result.Errors.Count -gt 0)
+    try
+    {
+        Invoke-Build -Task $Tasks -File $BuildFile -Result "result" -BuildRoot $buildRoot
+    }
+    catch
     {
         if ($ExitOnError)
         {
@@ -34,7 +36,7 @@ function Exit-Powershell {
         }
         else
         {
-            throw "Build Failed"
+            throw "Build Failed: $_"
         }
     }
 }
