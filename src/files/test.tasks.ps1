@@ -33,6 +33,8 @@ task "RunPester" "Compile", {
 
         try
         {
+            if ($tags -eq "*") { $tags = @() }
+
             Import-Module -Name $manifestFilePath -Global -Force
             Invoke-Pester -PassThru -Verbose -CodeCoverage $moduleFilePath -Tag $tags
         }
