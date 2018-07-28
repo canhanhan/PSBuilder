@@ -78,15 +78,23 @@ task "CompileModule" `
     Set-Content -Path $MergedFilePath -Value ($builder.ToString()) -Force
 }
 
-task "CopyManifest" `
+task "CreateManifest" `
     -depends "CreateOutputDir" `
-    -requiredVariables "Name", "SourcePath", "ManifestDestination" `
-    -description "Copies manifest file to output" `
+    -requiredVariables "Name", "Guid", "Author", "Description", "ManifestDestination" `
+    -description "Creates a module manifest file" `
 {
+    $ManifestArguments = @{
+        "RootModule" = "$Name.psm1"
+        "Guid" = $Guid
+        "Author" = $Author
+        "Description" = $Description
+        "Copyright" = "(c) $((Get-Date).Year) $Author. All rights reserved."
+    }
+
     $ManifestFilePath = Join-Path -Path $SourcePath -ChildPath "$Name.psd1"
-    Copy-Item -Path $ManifestFilePath -Destination $ManifestDestination
+    New-ModuleManifest -Path $ManifestFilePath @ManifestArguments
 }
 
 task "Compile" `
-    -depends "Clean", "CreateOutputDir", "CopyFiles", "CopyLicense", "CopyManifest", "CompileModule", "Sign" `
+    -depends "Clean", "CreateOutputDir", "CopyFiles", "CopyLicense", "CreateManifest", "CompileModule", "Sign" `
     -description "Compiles and signs the module"
