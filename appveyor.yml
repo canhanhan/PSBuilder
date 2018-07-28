@@ -14,9 +14,7 @@ install:
       Install-Module platyPS -Force
 
 build_script:
-  - ps: |
-       Import-module .\src\PSBuilder.psm1
-       Invoke-Builder Publish
+  - powershell.exe -Command "Import-module .\src\PSBuilder.psm1; Invoke-Builder Publish"
 
 on_failure:
   - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
