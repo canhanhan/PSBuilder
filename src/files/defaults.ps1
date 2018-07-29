@@ -3,7 +3,9 @@ $Name = [IO.Path]::GetFileName([IO.Path]::GetDirectoryName($BuildRoot + "/"))
 [Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSUseDeclaredVarsMoreThanAssignment", "")]
 $ProjectBuildFile = Join-Path -Path $BuildRoot -ChildPath "build.ps1"
 
-$BuildOutput = Join-Path -Path $BuildRoot -ChildPath "output/$Name"
+$BuildOutputDirectory = Join-Path -Path $BuildRoot -ChildPath "output"
+
+$BuildOutput = Join-Path -Path $BuildOutputDirectory -ChildPath $Name
 
 $SourcePath = Join-Path -Path $BuildRoot -ChildPath "src"
 
@@ -45,3 +47,18 @@ $Sign = $false
 
 [Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSUseDeclaredVarsMoreThanAssignment", "")]
 $SignFiles = $true
+
+[Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSUseDeclaredVarsMoreThanAssignment", "")]
+$PublishToRepository = $false
+
+[Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSUseDeclaredVarsMoreThanAssignment", "")]
+$PublishToArchive = $true
+
+[Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSUseDeclaredVarsMoreThanAssignment", "")]
+$PublishToArchiveName = '$Name-$Version.zip'
+
+[Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSUseDeclaredVarsMoreThanAssignment", "")]
+$PublishToArchiveDestination = Join-Path -Path $BuildOutputDirectory -ChildPath $PublishToArchiveName
+
+[Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSUseDeclaredVarsMoreThanAssignment", "")]
+$PublishToAppveyor = $false

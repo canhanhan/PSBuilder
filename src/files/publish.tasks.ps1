@@ -1,11 +1,11 @@
-Task "PublishToRepository" "Compile", {
+Task "PublishToRepository" -If { $PublishToRepository } "Compile", {
     Requires "BuildOutput"
 
     $publishParams = @{ "Path" = $BuildOutput }
 
-    if (Test-Path "Variable:PublishRepository")
+    if (Test-Path "Variable:PublishToRepositoryName")
     {
-        $publishParams["Repository"] = $PublishRepository
+        $publishParams["Repository"] = $PublishToRepositoryName
     }
 
     $nugetApiKey = $Env:NugetCredential
@@ -17,4 +17,13 @@ Task "PublishToRepository" "Compile", {
     Publish-Module @publishParams
 }
 
-Task "Publish" "Build", "PublishToRepository"
+Task "PublishToArchive" -If { $PublishToArchive -or $PublishToAppveyor } "Compile", {
+    $PublishToArchiveDestination = [scriptblock]::Create("`"$PublishToArchiveDestination`"").Invoke()
+    Compress-Archive -Path $BuildOutput -DestinationPath $destination
+}
+
+Task "PublishToAppveyor" -If { $PublishToAppveyor  } "PublishToAppveyor" {
+    Push-AppveyorArtifact $PublishToArchiveDestination
+}
+
+Task "Publish" "Build", "PublishToArchive", "PublishToAppveyor", "PublishToRepository"
