@@ -14,7 +14,7 @@ Task "PublishToRepository" "Compile", {
         $publishParams["NuGetApiKey"] = $nugetApiKey
     }
 
-    Publish-Module @publishParams
+    Publish-Module @publishParams -Verbose
 }
 
 Task "Publish" "Build", "PublishToRepository"
