@@ -1,9 +1,9 @@
 Task "Clean" {
-    Requires "BuildOutput"
+    Requires "BuildOutputDirectory"
 
-    if (Test-Path -Path $BuildOutput)
+    if (Test-Path -Path $BuildOutputDirectory)
     {
-        Remove-Item -Path $BuildOutput -Recurse -Force
+        Remove-Item -Path $BuildOutputDirectory -Recurse -Force
     }
 }
 
