@@ -28,7 +28,7 @@ task "RunPester" "Compile", {
 
     Set-Location -Path $TestsPath
     Import-Module -Name $ManifestDestination -Global -Force
-    $testResult = Invoke-Pester -PassThru -Verbose -CodeCoverage $MergedFilePath -Tag $tags
+    $testResult = Invoke-Pester -PassThru -Verbose -CodeCoverage $MergedFilePath -Tag $tags -OutputFile $TestResultsFile -OutputFormat NUnitXml
 
     assert ($testResult.FailedCount -eq 0) ('Failed {0} Unit tests. Aborting Build' -f $testResult.FailedCount)
 
@@ -46,4 +46,10 @@ task "RunPester" "Compile", {
     assert ($CodeCoverageMin -le $testCoverage) ('Code coverage must be higher or equal to {0}%. Current coverage: {1}%' -f ($CodeCoverageMin, $testCoverage))
 }
 
-task Test "Compile", "Analyze", "RunPester"
+Task "UploadTestResultsToAppveyor" -If { $UploadTestResultsToAppveyor } {
+    Requires "TestResultsFile"
+
+    [Net.WebClient]::new().UploadFile("https://ci.appveyor.com/api/testresults/nunit/$($env:APPVEYOR_JOB_ID)", $TestResultsFile)
+}
+
+task Test "Compile", "Analyze", "RunPester", "UploadTestResultsToAppveyor"

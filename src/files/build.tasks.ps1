@@ -34,6 +34,10 @@ param (
 
     $TestTags = @("*"),
 
+    $TestResultsFile = (Join-Path -Path $BuildOutputDirectory -ChildPath "TestResults.xml"),
+
+    $UploadTestResultsToAppveyor = (Test-Path -Path "Env:APPVEYOR_JOB_ID"),
+
     $ExtensionsToSign = ("*.ps1", "*.psd1", "*.psm1"),
 
     $Sign = $false,
@@ -48,7 +52,7 @@ param (
 
     $PublishToArchiveDestination = (Join-Path -Path $BuildOutputDirectory -ChildPath $PublishToArchiveName),
 
-    $PublishToAppveyor = $false
+    $PublishToAppveyor = (Test-Path -Path "Env:APPVEYOR_JOB_ID")
 )
 
 . (Join-Path -Path $PSScriptRoot -ChildPath "compile.tasks.ps1")
