@@ -4,6 +4,8 @@ param (
 
     [string]$Name = [IO.Path]::GetFileName([IO.Path]::GetDirectoryName($BuildRoot + "/")),
 
+    [string]$Version = $ENV:APPVEYOR_BUILD_VERSION,
+
     [string]$ProjectBuildFile = (Join-Path -Path $BuildRoot -ChildPath "build.ps1"),
 
     $BuildOutputDirectory = (Join-Path -Path $BuildRoot -ChildPath "output"),
