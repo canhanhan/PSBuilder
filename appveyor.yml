@@ -4,6 +4,9 @@ branches:
 
 image: 'Visual Studio 2017'
 
+environment:
+  psbuilderPublishToAppveyor: true
+
 build: off
 
 install:
