@@ -1,9 +1,10 @@
-os:
-  - "WMF 5"
-
 branches:
   only:
     - master
+
+image: 'Visual Studio 2017'
+
+build: off
 
 install:
   - ps: PowerShell -command "Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force | Out-Null; Install-Module PowershellGet -SkipPublisherCheck -Force; Install-Module PackageManagement -SkipPublisherCheck -Force"
@@ -15,7 +16,7 @@ install:
       Install-Module platyPS -Force
 
 build_script:
-  - powershell.exe -Command "Import-module .\src\PSBuilder.psm1; Invoke-Builder Publish -ExitOnError"
+  - ps: Import-module .\src\PSBuilder.psm1; Invoke-Builder Publish -ExitOnError
 
 on_failure:
   - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
