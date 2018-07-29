@@ -16,6 +16,9 @@ $DocumentationPath = Join-Path $BuildRoot -ChildPath "docs"
 $FilesPath = Join-Path -Path $SourcePath -ChildPath "files"
 
 [Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSUseDeclaredVarsMoreThanAssignment", "")]
+$TestsPath = Join-Path -Path $BuildRoot -ChildPath "tests"
+
+[Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSUseDeclaredVarsMoreThanAssignment", "")]
 $LicensePath = Join-Path -Path $BuildRoot -ChildPath "LICENSE"
 
 [Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSUseDeclaredVarsMoreThanAssignment", "")]

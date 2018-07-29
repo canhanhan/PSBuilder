@@ -23,26 +23,12 @@ Task "Analyze" "Compile", {
 task "RunPester" "Compile", {
     Requires "BuildRoot", "ManifestDestination", "CodeCoverageMin", "TestTags"
 
-    $testResult = Start-Job -ArgumentList ("$BuildRoot\tests", $ManifestDestination, $MergedFilePath, $testTags) -ScriptBlock {
-        param($testPath, $manifestFilePath, $moduleFilePath, $tags)
+    $tags = $testTags
+    if ($tags -eq "*") { $tags = @() }
 
-        Set-StrictMode -Version Latest
-        $ErrorActionPreference = "Stop"
-
-        Push-Location -StackName "Testing" -Path $testPath
-
-        try
-        {
-            if ($tags -eq "*") { $tags = @() }
-
-            Import-Module -Name $manifestFilePath -Global -Force
-            Invoke-Pester -PassThru -Verbose -CodeCoverage $moduleFilePath -Tag $tags
-        }
-        finally
-        {
-            Pop-Location -StackName "Testing"
-        }
-    } | Receive-Job -Wait -AutoRemoveJob
+    Set-Location -Path $TestsPath
+    Import-Module -Name $ManifestDestination -Global -Force
+    $testResult = Invoke-Pester -PassThru -Verbose -CodeCoverage $MergedFilePath -Tag $tags
 
     assert ($testResult.FailedCount -eq 0) ('Failed {0} Unit tests. Aborting Build' -f $testResult.FailedCount)
 
