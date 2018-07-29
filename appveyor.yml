@@ -8,7 +8,6 @@ build: off
 
 install:
   - ps: PowerShell -command "Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force | Out-Null; Install-Module PowershellGet -SkipPublisherCheck -Force; Install-Module PackageManagement -SkipPublisherCheck -Force"
-  - ps: Invoke-WebRequest -Uri 'https://dot.net/v1/dotnet-install.ps1' -OutFile '.\dotnet-install.ps1'; & '.\dotnet-install.ps1' -Channel Current -Version '2.0.0'
   - ps: |
       Install-Module Pester -Force
       Install-Module InvokeBuild -Force
