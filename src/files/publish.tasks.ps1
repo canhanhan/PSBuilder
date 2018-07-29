@@ -18,7 +18,7 @@ Task "PublishToRepository" -If { $PublishToRepository } "Compile", {
 }
 
 Task "PublishToArchive" -If { $PublishToArchive -eq $true -or $PublishToAppveyor -eq $true } "Compile", {
-    $PublishToArchiveDestination = [scriptblock]::Create("`"$PublishToArchiveDestination`"").Invoke()
+    $Script:PublishToArchiveDestination = [scriptblock]::Create("`"$PublishToArchiveDestination`"").Invoke()
     Compress-Archive -Path $BuildOutput -DestinationPath $PublishToArchiveDestination -Force
 }
 
