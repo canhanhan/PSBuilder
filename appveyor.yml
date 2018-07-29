@@ -8,14 +8,15 @@ build: off
 
 install:
   - ps: PowerShell -command "Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force | Out-Null; Install-Module PowershellGet -SkipPublisherCheck -Force; Install-Module PackageManagement -SkipPublisherCheck -Force"
+  - ps: Invoke-WebRequest -Uri 'https://dot.net/v1/dotnet-install.ps1' -OutFile '.\dotnet-install.ps1'; & '.\dotnet-install.ps1' -Channel Current -Version '2.0.0'
   - ps: |
-      Install-Module Pester -Force
-      Install-Module InvokeBuild -Force
-      Install-Module PSScriptAnalyzer -Force
-      Install-Module platyPS -Force
+      Install-Module Pester -Force -SkipPublisherCheck
+      Install-Module InvokeBuild -Force -SkipPublisherCheck
+      Install-Module PSScriptAnalyzer -Force -SkipPublisherCheck
+      Install-Module platyPS -Force -SkipPublisherCheck
 
 build_script:
-  - ps: Import-module .\src\PSBuilder.psm1; Invoke-Builder Publish -ExitOnError
+  - powershell.exe -Command "Import-module .\src\PSBuilder.psm1; Invoke-Builder Publish -ExitOnError"
 
 on_failure:
   - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
