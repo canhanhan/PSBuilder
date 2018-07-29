@@ -19,10 +19,10 @@ Task "PublishToRepository" -If { $PublishToRepository } "Compile", {
 
 Task "PublishToArchive" -If { $PublishToArchive -or $PublishToAppveyor } "Compile", {
     $PublishToArchiveDestination = [scriptblock]::Create("`"$PublishToArchiveDestination`"").Invoke()
-    Compress-Archive -Path $BuildOutput -DestinationPath $destination
+    Compress-Archive -Path $BuildOutput -DestinationPath $PublishToArchiveDestination -Force
 }
 
-Task "PublishToAppveyor" -If { $PublishToAppveyor  } "PublishToAppveyor" {
+Task "PublishToAppveyor" -If { $PublishToAppveyor  } "PublishToArchive", {
     Push-AppveyorArtifact $PublishToArchiveDestination
 }
 
