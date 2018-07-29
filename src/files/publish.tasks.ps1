@@ -17,12 +17,12 @@ Task "PublishToRepository" -If { $PublishToRepository } "Compile", {
     Publish-Module @publishParams
 }
 
-Task "PublishToArchive" -If { $PublishToArchive -or $PublishToAppveyor } "Compile", {
+Task "PublishToArchive" -If { $PublishToArchive -eq $true -or $PublishToAppveyor -eq $true } "Compile", {
     $PublishToArchiveDestination = [scriptblock]::Create("`"$PublishToArchiveDestination`"").Invoke()
     Compress-Archive -Path $BuildOutput -DestinationPath $PublishToArchiveDestination -Force
 }
 
-Task "PublishToAppveyor" -If { $PublishToAppveyor  } "PublishToArchive", {
+Task "PublishToAppveyor" -If { $PublishToAppveyor -eq $true  } "PublishToArchive", {
     Push-AppveyorArtifact $PublishToArchiveDestination
 }
 
