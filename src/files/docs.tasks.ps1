@@ -1,25 +1,20 @@
 Task "GenerateDocs" "Compile", {
     Requires "Name", "ManifestDestination", "DocumentationPath"
 
-    Start-Job -ScriptBlock {
-        Set-StrictMode -Version Latest
-        $ErrorActionPreference = "Stop"
+    Import-Module -Name $ManifestDestination -Global -Force
 
-        Import-Module -Name $using:ManifestDestination -Global -Force
+    if (-not (Test-Path -Path $DocumentationPath))
+    {
+        New-Item -Path $DocumentationPath -ItemType Directory -Force | Out-Null
+    }
 
-        if (-not (Test-Path -Path $using:DocumentationPath))
-        {
-            New-Item -Path $using:DocumentationPath -ItemType Directory -Force | Out-Null
-        }
+    $moduleFile = Join-Path -Path $DocumentationPath -ChildPath "$Name.md"
+    if (-not (Test-Path -Path $moduleFile))
+    {
+        New-MarkdownHelp -Module $Name -OutputFolder $DocumentationPath -WithModulePage | Out-Null
+    }
 
-        $moduleFile = Join-Path -Path $using:DocumentationPath -ChildPath "$($using:Name).md"
-        if (-not (Test-Path -Path $moduleFile))
-        {
-            New-MarkdownHelp -Module $using:Name -OutputFolder $using:DocumentationPath -WithModulePage | Out-Null
-        }
-
-        Update-MarkdownHelpModule -Path $using:DocumentationPath -RefreshModulePage | Out-Null
-    } | Receive-Job -Wait -AutoRemoveJob
+    Update-MarkdownHelpModule -Path $DocumentationPath -RefreshModulePage | Out-Null
 }
 
 Task "BuildDocs" "GenerateDocs", {
