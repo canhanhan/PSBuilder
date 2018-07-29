@@ -25,9 +25,12 @@ function Exit-Powershell {
     $buildRoot = (Get-Location).Path
     $buildFile = "$PSScriptRoot/files/build.tasks.ps1"
 
+    $buildParameters = @{ "BuildRoot" = $buildRoot }
+    (Get-ChildItem -Path "Env:").Where({ $_.Name -like "PSBuilder*" }).ForEach({ $buildParameters[$_.Name.Substring(9)] = $_.Value })
+
     try
     {
-        Invoke-Build -Task $Tasks -File $BuildFile -Result "result" -BuildRoot $buildRoot
+        Invoke-Build -Task $Tasks -File $BuildFile -Result "result" @buildParameters
     }
     catch
     {
