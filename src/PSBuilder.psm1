@@ -30,9 +30,17 @@ function Exit-Powershell {
 
     try
     {
+        $failed = $false
         Invoke-Build -Task $Tasks -File $BuildFile -Result "result" @buildParameters
     }
     catch
+    {
+        $failed = $true
+        if (-not $ExitOnError) { throw }
+    }
+
+
+    if ($failed -or $result.Errors.Count -gt 0)
     {
         if ($ExitOnError)
         {
@@ -40,7 +48,7 @@ function Exit-Powershell {
         }
         else
         {
-            throw "Build Failed: $_"
+            throw "Build Failed..."
         }
     }
 }
