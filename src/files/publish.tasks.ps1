@@ -1,4 +1,4 @@
-Task "PublishToRepository" -If { $PublishToRepository } "Compile", {
+Task "PublishToRepository" -If { $PublishToRepository -eq $true } "Compile", {
     Requires "BuildOutput"
 
     $publishParams = @{ "Path" = $BuildOutput }
