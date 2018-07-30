@@ -40,7 +40,7 @@ param (
 
     [string]$UploadTestResultsToAppveyor = (Test-Path -Path "Env:APPVEYOR_JOB_ID"),
 
-    [string]$ExtensionsToSign = ("*.ps1", "*.psd1", "*.psm1"),
+    [string[]]$ExtensionsToSign = ("*.ps1", "*.psd1", "*.psm1"),
 
     [bool]$Sign = $false,
 
