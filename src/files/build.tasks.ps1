@@ -8,53 +8,53 @@ param (
 
     [string]$ProjectBuildFile = (Join-Path -Path $BuildRoot -ChildPath "build.ps1"),
 
-    $BuildOutputDirectory = (Join-Path -Path $BuildRoot -ChildPath "output"),
+    [string]$BuildOutputDirectory = (Join-Path -Path $BuildRoot -ChildPath "output"),
 
-    $BuildOutput = (Join-Path -Path $BuildOutputDirectory -ChildPath $Name),
+    [string]$BuildOutput = (Join-Path -Path $BuildOutputDirectory -ChildPath $Name),
 
-    $SourcePath = (Join-Path -Path $BuildRoot -ChildPath "src"),
+    [string]$SourcePath = (Join-Path -Path $BuildRoot -ChildPath "src"),
 
-    $DocumentationPath = (Join-Path $BuildRoot -ChildPath "docs"),
+    [string]$DocumentationPath = (Join-Path $BuildRoot -ChildPath "docs"),
 
-    $FilesPath = (Join-Path -Path $SourcePath -ChildPath "files"),
+    [string]$FilesPath = (Join-Path -Path $SourcePath -ChildPath "files"),
 
-    $TestsPath = (Join-Path -Path $BuildRoot -ChildPath "tests"),
+    [string]$TestsPath = (Join-Path -Path $BuildRoot -ChildPath "tests"),
 
-    $LicensePath = (Join-Path -Path $BuildRoot -ChildPath "LICENSE"),
+    [string]$LicensePath = (Join-Path -Path $BuildRoot -ChildPath "LICENSE"),
 
-    $SourceFilePath = (Join-Path -Path $SourcePath -ChildPath "$Name.psm1"),
+    [string]$SourceFilePath = (Join-Path -Path $SourcePath -ChildPath "$Name.psm1"),
 
-    $ManifestDestination = (Join-Path -Path $BuildOutput -ChildPath "$Name.psd1"),
+    [string]$ManifestDestination = (Join-Path -Path $BuildOutput -ChildPath "$Name.psd1"),
 
-    $MergedFilePath = (Join-Path -Path $BuildOutput -ChildPath "$Name.psm1"),
+    [string]$MergedFilePath = (Join-Path -Path $BuildOutput -ChildPath "$Name.psm1"),
 
-    $CodeCoverageMin = 0,
+    [int]$CodeCoverageMin = 0,
 
-    $AnalysisFailureLevel = "Error",
+    [string]$AnalysisFailureLevel = "Error",
 
-    $AnalysisSettingsFile = (Join-Path -Path $BuildRoot -ChildPath "PSScriptAnalyzerSettings.psd1"),
+    [string]$AnalysisSettingsFile = (Join-Path -Path $BuildRoot -ChildPath "PSScriptAnalyzerSettings.psd1"),
 
-    $TestTags = @("*"),
+    [string[]]$TestTags = @("*"),
 
-    $TestResultsFile = (Join-Path -Path $BuildOutputDirectory -ChildPath "TestResults.xml"),
+    [string]$TestResultsFile = (Join-Path -Path $BuildOutputDirectory -ChildPath "TestResults.xml"),
 
-    $UploadTestResultsToAppveyor = (Test-Path -Path "Env:APPVEYOR_JOB_ID"),
+    [string]$UploadTestResultsToAppveyor = (Test-Path -Path "Env:APPVEYOR_JOB_ID"),
 
-    $ExtensionsToSign = ("*.ps1", "*.psd1", "*.psm1"),
+    [string]$ExtensionsToSign = ("*.ps1", "*.psd1", "*.psm1"),
 
-    $Sign = $false,
+    [bool]$Sign = $false,
 
-    $SignFiles = $true,
+    [bool]$SignFiles = $true,
 
-    $PublishToRepository = $false,
+    [bool]$PublishToRepository = $false,
 
-    $PublishToArchive = $true,
+    [bool]$PublishToArchive = $true,
 
-    $PublishToArchiveName = '$Name-$Version.zip',
+    [string]$PublishToArchiveName = '$Name-$Version.zip',
 
-    $PublishToArchiveDestination = (Join-Path -Path $BuildOutputDirectory -ChildPath $PublishToArchiveName),
+    [string]$PublishToArchiveDestination = (Join-Path -Path $BuildOutputDirectory -ChildPath $PublishToArchiveName),
 
-    $PublishToAppveyor = (Test-Path -Path "Env:APPVEYOR_JOB_ID")
+    [string]$PublishToAppveyor = (Test-Path -Path "Env:APPVEYOR_JOB_ID")
 )
 
 . (Join-Path -Path $PSScriptRoot -ChildPath "compile.tasks.ps1")
