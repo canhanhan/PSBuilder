@@ -5,6 +5,7 @@ function Invoke-PesterTest
         [string]$Path,
         [string]$Module,
         [string]$OutputPath,
+        [string]$CoverageOutputPath,
         [int]$MinCoverage=0
     )
 
@@ -19,7 +20,16 @@ function Invoke-PesterTest
         Set-Location -Path $Path
         Import-Module -Name $Module -Force
         $files = @(Get-ChildItem -Path ([IO.Path]::GetDirectoryName($Module)) -Include "*.ps1","*.psm1" -File -Recurse)
-        $testResult = Invoke-Pester -PassThru -CodeCoverage $files -Tag $tags -OutputFile $OutputPath -OutputFormat "NUnitXml"
+        $pesterArgs = @{
+            CodeCoverage = $files
+            Tag = $tags
+            OutputFile = $OutputPath
+            OutputFormat = "NUnitXml"
+            CodeCoverageOutputFile = $CoverageOutputPath
+            CodeCoverageOutputFileFormat = "JaCoCo"
+            PassThru = $true
+        }
+        $testResult = Invoke-Pester @pesterArgs
 
         assert ($testResult.FailedCount -eq 0) ('Failed {0} Unit tests. Aborting Build' -f $testResult.FailedCount)
 

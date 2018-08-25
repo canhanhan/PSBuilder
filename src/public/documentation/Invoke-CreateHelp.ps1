@@ -11,5 +11,5 @@ function Invoke-CreateHelp
     )
 
     $destinationPath = Join-Path -Path $Destination -ChildPath $Language
-    New-ExternalHelp -Path $Source -OutputPath $destinationPath | Out-Null
+    New-ExternalHelp -Path $Source -OutputPath $destinationPath -Force | Out-Null
 }

@@ -4,39 +4,43 @@ param (
 
     [string]$Name = [IO.Path]::GetFileName([IO.Path]::GetDirectoryName($BuildRoot + "/")),
 
-    [string]$Version = $ENV:APPVEYOR_BUILD_VERSION,
+    [string]$Version = $null,
 
-    [string]$ProjectBuildFile = (Join-Path -Path $BuildRoot -ChildPath "build.ps1"),
+    [string]$VersionSuffix = $null,
 
-    [string]$BuildOutputDirectory = (Join-Path -Path $BuildRoot -ChildPath "output"),
+    [string]$ProjectBuildFile = $null,
 
-    [string]$BuildOutput = (Join-Path -Path $BuildOutputDirectory -ChildPath $Name),
+    [string]$BuildOutputDirectory = $null,
 
-    [string]$SourcePath = (Join-Path -Path $BuildRoot -ChildPath "src"),
+    [string]$BuildOutput = $null,
 
-    [string]$DocumentationPath = (Join-Path $BuildRoot -ChildPath "docs"),
+    [string]$SourcePath = $null,
+
+    [string]$DocumentationPath = $null,
 
     [string[]]$FilesPath = ("files", "lib", "bin"),
 
-    [string]$TestsPath = (Join-Path -Path $BuildRoot -ChildPath "tests"),
+    [string]$TestsPath = $null,
 
-    [string]$LicensePath = (Join-Path -Path $BuildRoot -ChildPath "LICENSE"),
+    [string]$LicensePath = $null,
 
-    [string]$SourceFilePath = (Join-Path -Path $SourcePath -ChildPath "$Name.psm1"),
+    [string]$SourceFilePath = $null,
 
-    [string]$ManifestDestination = (Join-Path -Path $BuildOutput -ChildPath "$Name.psd1"),
+    [string]$ManifestDestination = $null,
 
-    [string]$MergedFilePath = (Join-Path -Path $BuildOutput -ChildPath "$Name.psm1"),
+    [string]$MergedFilePath = $null,
 
     [int]$CodeCoverageMin = 0,
 
     [string]$AnalysisFailureLevel = "Error",
 
-    [string]$AnalysisSettingsFile = (Join-Path -Path $BuildRoot -ChildPath "PSScriptAnalyzerSettings.psd1"),
+    [string]$AnalysisSettingsFile = $null,
 
     [string[]]$TestTags = @("*"),
 
-    [string]$TestResultsFile = (Join-Path -Path $BuildOutputDirectory -ChildPath "TestResults.xml"),
+    [string]$TestResultsFile = $null,
+
+    [string]$CoverageResultsFile = $null,
 
     [bool]$UploadTestResultsToAppveyor = (Test-Path -Path "Env:APPVEYOR_JOB_ID"),
 
@@ -46,16 +50,52 @@ param (
 
     [bool]$SignFiles = $true,
 
+    [string]$SignHashAlgorithm = "SHA256",
+
+    [string]$CertificatePath = "Cert:\CurrentUser\My",
+
+    [securestring]$CertificatePassword = $null,
+
+    [string]$CertificateThumbprint = $null,
+
+    [string]$CertificateSubject = $null,
+
     [bool]$PublishToRepository = $false,
 
     [bool]$PublishToArchive = $true,
 
-    [string]$PublishToArchiveName = '$Name-$Version.zip',
+    [string]$PublishToArchiveName = $null,
 
-    [string]$PublishToArchiveDestination = (Join-Path -Path $BuildOutputDirectory -ChildPath $PublishToArchiveName),
+    [string]$PublishToArchiveDestination = $null,
 
-    [bool]$PublishToAppveyor = (Test-Path -Path "Env:APPVEYOR_JOB_ID")
+    [bool]$PublishToAppveyor = (Test-Path -Path "Env:APPVEYOR_JOB_ID"),
+
+    [string]$LicenseUri = $null,
+
+    [string]$ProjectUri = $null,
+
+    [string]$IconUri = $null,
+
+    [string[]]$Tags = @()
 )
+
+if ([string]::IsNullOrEmpty($ProjectBuildFile)) { $ProjectBuildFile = Join-Path -Path $BuildRoot -ChildPath "build.ps1" }
+if (Test-Path -Path $ProjectBuildFile) { . $ProjectBuildFile }
+
+if ([string]::IsNullOrEmpty($BuildOutputDirectory)) { $BuildOutputDirectory = Join-Path -Path $BuildRoot -ChildPath "output" }
+if ([string]::IsNullOrEmpty($BuildOutput)) { $BuildOutput = Join-Path -Path $BuildOutputDirectory -ChildPath $Name }
+if ([string]::IsNullOrEmpty($SourcePath)) { $SourcePath = Join-Path -Path $BuildRoot -ChildPath "src" }
+if ([string]::IsNullOrEmpty($DocumentationPath)) { $DocumentationPath = Join-Path $BuildRoot -ChildPath "docs" }
+if ([string]::IsNullOrEmpty($TestsPath)) { $TestsPath = Join-Path -Path $BuildRoot -ChildPath "tests" }
+if ([string]::IsNullOrEmpty($TestResultsFile)) { $TestResultsFile = Join-Path -Path $BuildOutputDirectory -ChildPath "TestResults.xml" }
+if ([string]::IsNullOrEmpty($CoverageResultsFile)) { $CoverageResultsFile = Join-Path -Path $BuildOutputDirectory -ChildPath "CoverageResults.xml" }
+if ([string]::IsNullOrEmpty($LicensePath)) { $LicensePath = Join-Path -Path $BuildRoot -ChildPath "LICENSE" }
+if ([string]::IsNullOrEmpty($SourceFilePath)) { $SourceFilePath = Join-Path -Path $SourcePath -ChildPath "$Name.psm1" }
+if ([string]::IsNullOrEmpty($ManifestDestination)) { $ManifestDestination = Join-Path -Path $BuildOutput -ChildPath "$Name.psd1" }
+if ([string]::IsNullOrEmpty($MergedFilePath)) { $MergedFilePath = Join-Path -Path $BuildOutput -ChildPath "$Name.psm1" }
+if ([string]::IsNullOrEmpty($AnalysisSettingsFile)) { $AnalysisSettingsFile = Join-Path -Path $BuildRoot -ChildPath "PSScriptAnalyzerSettings.psd1" }
+if ([string]::IsNullOrEmpty($PublishToArchiveName)) { $PublishToArchiveName = "$Name-$Version$VersionSuffix.zip" }
+if ([string]::IsNullOrEmpty($PublishToArchiveDestination)) { $PublishToArchiveDestination = Join-Path -Path $BuildOutputDirectory -ChildPath $PublishToArchiveName }
 
 Task "Clean" {
     Requires "BuildOutputDirectory"
@@ -66,41 +106,111 @@ Task "Clean" {
     }
 }
 
-Task "Compile" "Clean", {
-    Requires "BuildOutput", "FilesPath", "LicensePath"
+Task "Compile" @{
+    Inputs = { Get-ChildItem $SourcePath -Recurse -Include "*.*" -Exclude "TempPSBuilder.psm1" }
+    Outputs = { $MergedFilePath }
+    Jobs = {
+        Requires "BuildOutput", "FilesPath", "LicensePath"
 
-    #Create output directory
-    if (-not (Test-Path -Path $BuildOutput))
-    {
-        New-Item -Path $BuildOutput -ItemType "Directory" -Force | Out-Null
-    }
-
-    #Copy additional files
-    foreach ($fileLocation in $FilesPath)
-    {
-        $path = (Join-Path -Path $SourcePath -ChildPath $fileLocation)
-        if (Test-Path -Path $path)
+        #Create output directory
+        if (-not (Test-Path -Path $BuildOutput))
         {
-            Copy-Item -Path $path -Destination $BuildOutput -Recurse -Container -Force
+            New-Item -Path $BuildOutput -ItemType "Directory" -Force | Out-Null
+        }
+
+        #Copy additional files
+        foreach ($fileLocation in $FilesPath)
+        {
+            $path = (Join-Path -Path $SourcePath -ChildPath $fileLocation)
+            if (Test-Path -Path $path)
+            {
+                Copy-Item -Path $path -Destination $BuildOutput -Recurse -Container -Force
+            }
+        }
+
+        #Copy license files
+        if (-not [string]::IsNullOrEmpty($LicensePath) -and (Test-Path -Path $LicensePath))
+        {
+            Copy-Item -Path $LicensePath -Destination $BuildOutput -Force
+        }
+
+        Invoke-CompileModule -Name $Name -Source $SourcePath -Destination $MergedFilePath
+
+        if ([string]::IsNullOrWhiteSpace($Version))
+        {
+            if (-not [string]::IsNullOrWhiteSpace($ENV:APPVEYOR_BUILD_VERSION))
+            {
+                $Version = $ENV:APPVEYOR_BUILD_VERSION
+            }
+            else
+            {
+                $Version = "1.0.0"
+            }
+        }
+
+        #Create module manifest
+        $manifestArgs = @{
+            Name = $Name
+            Path = $ManifestDestination
+            ModuleFilePath = $MergedFilePath
+            Author = $Author
+            Description = $Description
+            Guid = $Guid
+            Version = $Version
+        }
+
+        if (-not [string]::IsNullOrEmpty($VersionSuffix))
+        {
+            $manifestArgs.Prerelease = $VersionSuffix
+        }
+
+        if (-not [string]::IsNullOrEmpty($LicenseUri))
+        {
+            $manifestArgs.LicenseUri = $LicenseUri
+        }
+
+        if (-not [string]::IsNullOrEmpty($ProjectUri))
+        {
+            $manifestArgs.ProjectUri = $ProjectUri
+        }
+
+        if (-not [string]::IsNullOrEmpty($IconUri))
+        {
+            $manifestArgs.IconUri = $IconUri
+        }
+
+        if ($null -ne $Tags -and $Tags.Count -gt 0)
+        {
+            $manifestArgs.Tags = $Tags
+        }
+
+        Invoke-CreateModuleManifest @manifestArgs
+
+        #Create module documentation
+        $modulePath = $MyInvocation.MyCommand.ScriptBlock.Module.Path
+        Start-Job -ScriptBlock {
+            Import-Module -Name $using:modulePath | Out-Null
+            Import-Module -Name $using:ManifestDestination | Out-Null
+
+            Invoke-CreateMarkdown -Path $using:DocumentationPath -Manifest $using:ManifestDestination
+            Invoke-CreateHelp -Source $using:DocumentationPath -Destination $using:BuildOutput
+        } | Receive-Job -Wait -AutoRemoveJob
+
+        #Sign module files
+        if ($Sign)
+        {
+            $signArgs = @{
+                Name = $Name
+                Path = $BuildOutput
+                CertificateThumbprint = $CertificateThumbprint
+                CertificateSubject = $CertificateSubject
+                CertificatePath = $CertificatePath
+                CertificatePassword = $CertificatePassword
+                HashAlgorithm = $SignHashAlgorithm
+            }
+            Invoke-Sign @signArgs
         }
     }
-
-    #Copy license files
-    if (-not [string]::IsNullOrEmpty($LicensePath) -and (Test-Path -Path $LicensePath))
-    {
-        Copy-Item -Path $LicensePath -Destination $BuildOutput -Force
-    }
-
-    Invoke-CompileModule -Name $Name -Source $SourcePath -Destination $MergedFilePath
-    Invoke-CreateModuleManifest -Name $Name -Path $ManifestDestination -ModuleFilePath $MergedFilePath -Author $Author -Description $Description -Guid $Guid
-
-    if ($Sign)
-    {
-        Invoke-Sign -Path $Path -CertificateThumbprint $CertificateThumbprint -CertificateSubject $CertificateSubject
-    }
-
-    Invoke-CreateMarkdown -Path $DocumentationPath -Manifest $ManifestDestination
-    Invoke-CreateHelp -Source $DocumentationPath -Destination $BuildOutput
 }
 
 Task "Analyze" "Compile", {
@@ -108,7 +218,7 @@ Task "Analyze" "Compile", {
 }
 
 Task "Test" "Compile", {
-    Invoke-PesterTest -Path $TestsPath -Tags $TestTags -Module $ManifestDestination -OutputPath $TestResultsFile -MinCoverage $CodeCoverageMin
+    Invoke-PesterTest -Path $TestsPath -Tags $TestTags -Module $ManifestDestination -OutputPath $TestResultsFile -MinCoverage $CodeCoverageMin -CoverageOutputPath $CoverageResultsFile
 
     if (-not [string]::IsNullOrEmpty($TestResultsFile))
     {
@@ -140,5 +250,3 @@ Task "Publish" "Build", {
 Task "GenerateCert" {
     Invoke-GenerateSelfSignedCert
 }
-
-if (Test-Path -Path $ProjectBuildFile) { . $ProjectBuildFile }

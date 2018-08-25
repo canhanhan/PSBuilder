@@ -9,7 +9,6 @@ function Invoke-CreateMarkdown
     )
 
     $module = Import-Module -Name $Manifest -Global -Force -PassThru
-
     if (-not (Test-Path -Path $Path))
     {
         New-Item -Path $Path -ItemType Directory -Force | Out-Null

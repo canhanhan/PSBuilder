@@ -6,7 +6,7 @@ function Clone-SampleModule {
     $ModuleDestination = Join-Path -Path $testDrive -ChildPath "SampleModule"
 
     if (Test-Path $ModuleDestination) { Remove-Item -Path $ModuleDestination -Recurse -Force }
-    Copy-Item -Path $ModuleSource -Destination $testDrive -Recurse
+    Copy-Item -Path $ModuleSource -Destination $testDrive -Recurse -Force
 
     Push-Location -Path $ModuleDestination -StackName "TestPath"
     $OutputPath = Join-Path -Path $ModuleDestination -ChildPath "Output/SampleModule"

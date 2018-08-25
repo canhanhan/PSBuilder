@@ -1,3 +1,5 @@
+param ($Action="Build")
+
 $isDotSourced = $MyInvocation.InvocationName -eq '.' -or $MyInvocation.Line -eq ''
 
 if ($isDotSourced)
@@ -11,9 +13,9 @@ if ($isDotSourced)
 }
 else
 {
-    . "$PSScriptRoot/src/private/build/Invoke-CompileModule.ps1"
-    $error.Clear()
+    . "$PSScriptRoot/src/public/build/Invoke-CompileModule.ps1"
     Invoke-CompileModule -Name "PSBuilder" -Source "$PSScriptRoot/src" -Destination "$PSScriptRoot/src/TempPSBuilder.psm1"
     Import-Module -Prefix "Temp" -Name "$PSScriptRoot/src/TempPSBuilder.psm1" -Force
-    Invoke-TempBuilder Build -ExitOnError
+
+    Invoke-TempBuilder $Action -ExitOnError
 }

@@ -13,7 +13,7 @@ Executes build tasks
 ## SYNTAX
 
 ```
-Invoke-Builder [[-Tasks] <String[]>] [-TestTags <String[]>] [-ExitOnError] [<CommonParameters>]
+Invoke-Builder [[-Tasks] <String[]>] [-Parameters <Hashtable>] [-ExitOnError] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -45,6 +45,21 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
+### -Parameters
+{{Fill Parameters Description}}
+
+```yaml
+Type: Hashtable
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
 ### -Tasks
 {{Fill Tasks Description}}
 
@@ -55,21 +70,6 @@ Aliases:
 
 Required: False
 Position: 0
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-### -TestTags
-{{Fill TestTags Description}}
-
-```yaml
-Type: String[]
-Parameter Sets: (All)
-Aliases:
-
-Required: False
-Position: Named
 Default value: None
 Accept pipeline input: False
 Accept wildcard characters: False

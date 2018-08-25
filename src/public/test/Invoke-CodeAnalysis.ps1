@@ -12,7 +12,7 @@ function Invoke-CodeAnalysis
     $analysisParameters = @{}
     if (-not [string]::IsNullOrEmpty($SettingsFile) -and (Test-Path -Path $SettingsFile)) { $analysisParameters["Settings"] = $SettingsFile }
     $analysisResult = Invoke-ScriptAnalyzer -Path $Path -Recurse @analysisParameters
-    $analysisResult | Format-Table
+    $analysisResult | Format-Table | Out-String -Width 192
 
     $warnings = $analysisResult.Where({ $_.Severity -eq "Warning" -or $_.Severity -eq "Warning" }).Count
     $errors = $analysisResult.Where({ $_.Severity -eq "Error" }).Count
