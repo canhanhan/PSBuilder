@@ -16,9 +16,7 @@ install:
       Install-Module platyPS -Force -SkipPublisherCheck
 
 build_script:
-  - ps: |
-      (Copy-Item -Path ./src/PSBuilder.psm1 -Destination ./src/TempPSBuilder.psm1 -Force -PassThru).FullName | Import-Module -Prefix Temp -Force;
-      Invoke-TempBuilder Publish -ExitOnError
+  - ps: \& $PSScriptRoot\build.ps1
 
 on_failure:
   - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
