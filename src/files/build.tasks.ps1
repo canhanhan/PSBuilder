@@ -16,7 +16,7 @@ param (
 
     [string]$DocumentationPath = (Join-Path $BuildRoot -ChildPath "docs"),
 
-    [string]$FilesPath = (Join-Path -Path $SourcePath -ChildPath "files"),
+    [string[]]$FilesPath = ("files", "lib", "bin"),
 
     [string]$TestsPath = (Join-Path -Path $BuildRoot -ChildPath "tests"),
 
@@ -38,7 +38,7 @@ param (
 
     [string]$TestResultsFile = (Join-Path -Path $BuildOutputDirectory -ChildPath "TestResults.xml"),
 
-    [string]$UploadTestResultsToAppveyor = (Test-Path -Path "Env:APPVEYOR_JOB_ID"),
+    [bool]$UploadTestResultsToAppveyor = (Test-Path -Path "Env:APPVEYOR_JOB_ID"),
 
     [string[]]$ExtensionsToSign = ("*.ps1", "*.psd1", "*.psm1"),
 
@@ -54,15 +54,91 @@ param (
 
     [string]$PublishToArchiveDestination = (Join-Path -Path $BuildOutputDirectory -ChildPath $PublishToArchiveName),
 
-    [string]$PublishToAppveyor = (Test-Path -Path "Env:APPVEYOR_JOB_ID")
+    [bool]$PublishToAppveyor = (Test-Path -Path "Env:APPVEYOR_JOB_ID")
 )
 
-. (Join-Path -Path $PSScriptRoot -ChildPath "compile.tasks.ps1")
-. (Join-Path -Path $PSScriptRoot -ChildPath "sign.tasks.ps1")
-. (Join-Path -Path $PSScriptRoot -ChildPath "docs.tasks.ps1")
-. (Join-Path -Path $PSScriptRoot -ChildPath "publish.tasks.ps1")
-. (Join-Path -Path $PSScriptRoot -ChildPath "test.tasks.ps1")
+Task "Clean" {
+    Requires "BuildOutputDirectory"
+
+    if (Test-Path -Path $BuildOutputDirectory)
+    {
+        Remove-Item -Path $BuildOutputDirectory -Recurse -Force
+    }
+}
+
+Task "Compile" "Clean", {
+    Requires "BuildOutput", "FilesPath", "LicensePath"
+
+    #Create output directory
+    if (-not (Test-Path -Path $BuildOutput))
+    {
+        New-Item -Path $BuildOutput -ItemType "Directory" -Force | Out-Null
+    }
+
+    #Copy additional files
+    foreach ($fileLocation in $FilesPath)
+    {
+        $path = (Join-Path -Path $SourcePath -ChildPath $fileLocation)
+        if (Test-Path -Path $path)
+        {
+            Copy-Item -Path $path -Destination $BuildOutput -Recurse -Container -Force
+        }
+    }
+
+    #Copy license files
+    if (-not [string]::IsNullOrEmpty($LicensePath) -and (Test-Path -Path $LicensePath))
+    {
+        Copy-Item -Path $LicensePath -Destination $BuildOutput -Force
+    }
+
+    Invoke-CompileModule -Name $Name -Source $SourcePath -Destination $MergedFilePath
+    Invoke-CreateModuleManifest -Name $Name -Path $ManifestDestination -ModuleFilePath $MergedFilePath -Author $Author -Description $Description -Guid $Guid
+
+    if ($Sign)
+    {
+        Invoke-Sign -Path $Path -CertificateThumbprint $CertificateThumbprint -CertificateSubject $CertificateSubject
+    }
+
+    Invoke-CreateMarkdown -Path $DocumentationPath -Manifest $ManifestDestination
+    Invoke-CreateHelp -Source $DocumentationPath -Destination $BuildOutput
+}
+
+Task "Analyze" "Compile", {
+    Invoke-CodeAnalysis -Path $BuildOutput -SettingsFile $AnalysisSettingsFile -FailureLevel $AnalysisFailureLevel
+}
+
+Task "Test" "Compile", {
+    Invoke-PesterTest -Path $TestsPath -Tags $TestTags -Module $ManifestDestination -OutputPath $TestResultsFile -MinCoverage $CodeCoverageMin
+
+    if (-not [string]::IsNullOrEmpty($TestResultsFile))
+    {
+        if ($UploadTestResultsToAppveyor) {
+            Invoke-WebRequest -UseBasicParsing -Uri "https://ci.appveyor.com/api/testresults/nunit/$($env:APPVEYOR_JOB_ID)" -InFile $TestResultsFile
+        }
+    }
+}
+
+Task "Build" "Compile", "Analyze", "Test"
+Task "Publish" "Build", {
+    if ($PublishToArchive -or $PublishToAppveyor)
+    {
+        $PublishToArchiveDestination = [scriptblock]::Create("`"$PublishToArchiveDestination`"").Invoke()
+        Compress-Archive -Path $BuildOutput -DestinationPath $PublishToArchiveDestination -Force
+
+        if ($PublishToAppveyor)
+        {
+            Push-AppveyorArtifact $PublishToArchiveDestination
+        }
+    }
+
+    if ($PublishToRepository)
+    {
+        Invoke-PublishToRepository -NugetApiKey $env:NugetApiKey -Repository $PublishToRepositoryName -Path $BuildOutput
+    }
+}
+
+Task "GenerateCert" {
+    Invoke-GenerateSelfSignedCert
+}
 
 if (Test-Path -Path $ProjectBuildFile) { . $ProjectBuildFile }
-
-Task "Build" "Compile", "Sign", "BuildDocs", "Test"
