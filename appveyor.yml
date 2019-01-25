@@ -16,7 +16,7 @@ install:
       Install-Module platyPS -Force -SkipPublisherCheck
 
 build_script:
-  - ps: '& .\build.ps1'
+  - ps: '& .\build.ps1 Publish'
 
 on_failure:
   - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
