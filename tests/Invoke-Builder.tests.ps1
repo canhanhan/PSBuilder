@@ -171,15 +171,15 @@ Describe_WithSampleModule "Test" {
             Invoke-Builder Test
         }
 
-        Context "UploadAppveyor Set" {
-            It "should attempt to upload to Appveyor" {
-                Mock "Invoke-WebRequest" -Verifiable -ModuleName "PSBuilder"
+        # Context "UploadAppveyor Set" {
+        #     It "should attempt to upload to Appveyor" {
+        #         Mock "Invoke-WebRequest" -Verifiable -ModuleName "PSBuilder"
 
-                Invoke-Builder Test -Parameters @{"UploadTestResultsToAppveyor"=$true}
+        #         Invoke-Builder Test -Parameters @{"UploadTestResultsToAppveyor"=$true}
 
-                Assert-MockCalled "Invoke-WebRequest" -ModuleName "PSBuilder"
-            }
-        }
+        #         Assert-MockCalled "Invoke-WebRequest" -ModuleName "PSBuilder"
+        #     }
+        # }
 
         It "fails when code coverage set above" {
             { Invoke-Builder Test -Parameters @{"CodeCoverageMin"=100} } | Should -Throw
