@@ -62,6 +62,8 @@ param (
 
     [bool]$PublishToRepository = $false,
 
+    [string]$PublishToRepositoryName = $null,
+
     [bool]$PublishToArchive = $true,
 
     [string]$PublishToArchiveName = $null,
