@@ -223,7 +223,7 @@ Task "Test" "Compile", {
     if (-not [string]::IsNullOrEmpty($TestResultsFile))
     {
         if ($UploadTestResultsToAppveyor) {
-            Invoke-WebRequest -UseBasicParsing -Uri "https://ci.appveyor.com/api/testresults/nunit/$($env:APPVEYOR_JOB_ID)" -InFile $TestResultsFile
+            Invoke-WebRequest -UseBasicParsing -Uri "https://ci.appveyor.com/api/testresults/nunit/$($env:APPVEYOR_JOB_ID)" -InFile $TestResultsFile -Method "Post"
         }
     }
 }
