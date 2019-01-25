@@ -9,12 +9,12 @@ if ($isDotSourced)
     $Author = 'Can Hanhan'
     $Description = 'PSBuilder provides re-usable, shared build tasks for building Powershell modules and scripts.'
     $PublishToRepositoryName = "PSGallery"
+    $PublishToRepository = ($Env:APPVEYOR_REPO_BRANCH -eq "master")
 }
 else
 {
     . "$PSScriptRoot/src/public/build/Invoke-CompileModule.ps1"
     Invoke-CompileModule -Name "PSBuilder" -Source "$PSScriptRoot/src" -Destination "$PSScriptRoot/src/TempPSBuilder.psm1"
     Import-Module -Prefix "Temp" -Name "$PSScriptRoot/src/TempPSBuilder.psm1" -Force
-
     Invoke-TempBuilder $Action -ExitOnError
 }
