@@ -66,6 +66,8 @@ param (
 
     [string]$DocumentationPath = $null,
 
+    [bool]$CreateDocumentation = $true,
+
     [string[]]$FilesPath = ("files", "lib", "bin"),
 
     [string]$TestsPath = $null,
@@ -182,7 +184,7 @@ Task "Clean" {
 }
 
 Task "Compile" @{
-    Inputs = { Get-ChildItem $SourcePath -Recurse -Include "*.*" -Exclude "TempPSBuilder.psm1" }
+    Inputs = { Get-ChildItem $SourcePath -Recurse -Include "*.ps1","*.psm1","*.psd1" -Exclude "TempPSBuilder.psm1" }
     Outputs = { $MergedFilePath }
     Jobs = {
         Requires "BuildOutput", "FilesPath", "LicensePath"
@@ -245,15 +247,18 @@ Task "Compile" @{
         }
         Invoke-CreateModuleManifest @manifestArgs
 
-        #Create module documentation
-        $modulePath = $MyInvocation.MyCommand.ScriptBlock.Module.Path
-        Start-Job -ScriptBlock {
-            Import-Module -Name $using:modulePath | Out-Null
-            Import-Module -Name $using:ManifestDestination | Out-Null
+        if ($CreateDocumentation)
+        {
+            #Create module documentation
+            $modulePath = $MyInvocation.MyCommand.ScriptBlock.Module.Path
+            Start-Job -ScriptBlock {
+                Import-Module -Name $using:modulePath | Out-Null
+                Import-Module -Name $using:ManifestDestination | Out-Null
 
-            Invoke-CreateMarkdown -Path $using:DocumentationPath -Manifest $using:ManifestDestination
-            Invoke-CreateHelp -Source $using:DocumentationPath -Destination $using:BuildOutput
-        } | Receive-Job -Wait -AutoRemoveJob
+                Invoke-CreateMarkdown -Path $using:DocumentationPath -Manifest $using:ManifestDestination
+                Invoke-CreateHelp -Source $using:DocumentationPath -Destination $using:BuildOutput
+            } | Receive-Job -Wait -AutoRemoveJob
+        }
 
         #Sign module files
         if ($Sign)
