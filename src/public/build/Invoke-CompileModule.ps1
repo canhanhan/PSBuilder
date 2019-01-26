@@ -38,7 +38,6 @@ function Invoke-CompileModule
         [void]$builder.AppendLine("Set-StrictMode -Version Latest")
         [void]$builder.AppendLine("`$ErrorActionPreference='Stop'")
 
-
         foreach ($buildFolder in $buildFolders)
         {
             $path = Join-Path -Path $Source -ChildPath $buildFolder
