@@ -14,7 +14,7 @@ schema: 2.0.0
 
 ```
 Invoke-CodeAnalysis [-Path] <String> [[-FailureLevel] <String>] [[-SettingsFile] <String>]
- [-ResultsFile <String>] [-SummaryFile <String>] [<CommonParameters>]
+ [[-ResultsFile] <String>] [[-SummaryFile] <String>] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -61,6 +61,21 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
+### -ResultsFile
+{{Fill ResultsFile Description}}
+
+```yaml
+Type: String
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: 3
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
 ### -SettingsFile
 {{Fill SettingsFile Description}}
 
@@ -76,21 +91,6 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
-### -ResultsFile
-{{Fill ResultsFile Description}}
-
-```yaml
-Type: String
-Parameter Sets: (All)
-Aliases:
-
-Required: False
-Position: Named
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
 ### -SummaryFile
 {{Fill SummaryFile Description}}
 
@@ -100,7 +100,7 @@ Parameter Sets: (All)
 Aliases:
 
 Required: False
-Position: Named
+Position: 4
 Default value: None
 Accept pipeline input: False
 Accept wildcard characters: False
