@@ -15,5 +15,5 @@ function Invoke-PublishToRepository
     if (-not [string]::IsNullOrEmpty($Repository)) { $publishParams["Repository"] = $Repository }
     if (-not [string]::IsNullOrEmpty($NugetApiKey)) { $publishParams["NuGetApiKey"] = $NugetApiKey }
 
-    Publish-Module @publishParams
+    Publish-Module @publishParams -ErrorAction Stop -Force
 }
