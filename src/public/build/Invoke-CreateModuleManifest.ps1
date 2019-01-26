@@ -27,6 +27,7 @@ function Invoke-CreateModuleManifest
         [string]$LicenseUri = $null,
         [string]$IconUri = $null,
         [string]$ProjectUri = $null,
+        [string]$ReleaseNotes = $null,
         [string]$HelpInfoUri = $null,
         [string[]]$CompatiblePSEditions = $null,
         [string]$PowerShellVersion = $null,
@@ -42,7 +43,8 @@ function Invoke-CreateModuleManifest
         [string[]]$NestedModules = $null,
         [string]$DefaultCommandPrefix = $null,
         [string[]]$Tags = $null,
-        [string]$Prerelease = $null
+        [string]$Prerelease = $null,
+        [bool]$RequireLicenseAcceptance=$false
     )
 
     $module = Get-Module -Name $ModuleFilePath -ListAvailable
@@ -76,76 +78,22 @@ function Invoke-CreateModuleManifest
         $dependency.Remove("Name")
         $dependency.Remove("External")
 
-        [void]$GalleryDependencies.Add([Microsoft.PowerShell.Commands.ModuleSpecification]::new($dependency))
+        [void]$GalleryDependencies.Add($dependency)
     }
 
-    $ManifestArguments = @{
+    $ManifestArguments = [ordered]@{
         "RootModule" = "$Name.psm1"
-        "Guid" = $Guid
-        "Author" = $Author
-        "Description" = $Description
-        "Copyright" = "(c) $((Get-Date).Year) $Author. All rights reserved."
         "ModuleVersion" = $Version
+        "GUID" = $Guid
+        "Author" = $Author
+        "CompanyName" = "Unknown"
+        "Copyright" = "(c) $((Get-Date).Year) $Author. All rights reserved."
+        "Description" = $Description
     }
 
     if (-not [string]::IsNullOrEmpty($CompanyName))
     {
         $ManifestArguments.CompanyName = $CompanyName
-    }
-
-    if ($Exports.Aliases.Count -gt 0)
-    {
-        $ManifestArguments.AliasesToExport = $Exports.Aliases
-    }
-
-    if ($Exports.Cmdlets.Count -gt 0)
-    {
-        $ManifestArguments.CmdletsToExport = $Exports.Cmdlets
-    }
-
-    if ($Exports.DscResources.Count -gt 0)
-    {
-        $ManifestArguments.DscResourcesToExport = $Exports.DscResources
-    }
-
-    if ($Exports.Functions.Count -gt 0)
-    {
-        $ManifestArguments.FunctionsToExport = $Exports.Functions
-    }
-
-    if ($Exports.Variables.Count -gt 0)
-    {
-        $ManifestArguments.VariablesToExport = $Exports.Variables
-    }
-
-    if ($GalleryDependencies.Count -gt 0)
-    {
-        $ManifestArguments.RequiredModules = $GalleryDependencies.ToArray()
-    }
-
-    if ($ExternalDependencies.Count -gt 0)
-    {
-        $ManifestArguments.ExternalModuleDependencies = $ExternalDependencies.ToArray()
-    }
-
-    if (-not [string]::IsNullOrEmpty($LicenseUri))
-    {
-        $ManifestArguments.LicenseUri = $LicenseUri
-    }
-
-    if (-not [string]::IsNullOrEmpty($ProjectUri))
-    {
-        $ManifestArguments.ProjectUri = $ProjectUri
-    }
-
-    if (-not [string]::IsNullOrEmpty($IconUri))
-    {
-        $ManifestArguments.IconUri = $IconUri
-    }
-
-    if (-not [string]::IsNullOrEmpty($HelpInfoUri))
-    {
-        $ManifestArguments.HelpInfoUri = $HelpInfoUri
     }
 
     if ($null -ne $CompatiblePSEditions -and $CompatiblePSEditions.Count -gt 0)
@@ -183,6 +131,11 @@ function Invoke-CreateModuleManifest
         $ManifestArguments.ProcessorArchitecture = $ProcessorArchitecture
     }
 
+    if ($GalleryDependencies.Count -gt 0)
+    {
+        $ManifestArguments.RequiredModules = $GalleryDependencies.ToArray()
+    }
+
     if ($null -ne $RequiredAssemblies -and $RequiredAssemblies.Count -gt 0)
     {
         $ManifestArguments.RequiredAssemblies = $RequiredAssemblies
@@ -208,14 +161,29 @@ function Invoke-CreateModuleManifest
         $ManifestArguments.NestedModules = $NestedModules
     }
 
-    if (-not [string]::IsNullOrEmpty($DefaultCommandPrefix))
+    if ($Exports.Functions.Count -gt 0)
     {
-        $ManifestArguments.DefaultCommandPrefix = $DefaultCommandPrefix
+        $ManifestArguments.FunctionsToExport = $Exports.Functions
     }
 
-    if (-not [string]::IsNullOrEmpty($Prerelease))
+    if ($Exports.Cmdlets.Count -gt 0)
     {
-        $ManifestArguments.Prerelease = $Prerelease
+        $ManifestArguments.CmdletsToExport = $Exports.Cmdlets
+    }
+
+    if ($Exports.Variables.Count -gt 0)
+    {
+        $ManifestArguments.VariablesToExport = $Exports.Variables
+    }
+
+    if ($Exports.Aliases.Count -gt 0)
+    {
+        $ManifestArguments.AliasesToExport = $Exports.Aliases
+    }
+
+    if ($Exports.DscResources.Count -gt 0)
+    {
+        $ManifestArguments.DscResourcesToExport = $Exports.DscResources
     }
 
     if ($null -ne $Tags -and $Tags.Count -gt 0)
@@ -223,10 +191,51 @@ function Invoke-CreateModuleManifest
         $ManifestArguments.Tags = $Tags
     }
 
-    if (-not (Test-Path -Path $Path))
+    $ManifestArguments.PrivateData = [ordered]@{ "PSData" = [ordered]@{} }
+    if (-not [string]::IsNullOrEmpty($LicenseUri))
     {
-        New-ModuleManifest -Path $Path -VariablesToExport @()
+        $ManifestArguments.PrivateData.PSData.LicenseUri = $LicenseUri
     }
 
-    Update-ModuleManifest -Path $Path @ManifestArguments
+    if (-not [string]::IsNullOrEmpty($ProjectUri))
+    {
+        $ManifestArguments.PrivateData.PSData.ProjectUri = $ProjectUri
+    }
+
+    if (-not [string]::IsNullOrEmpty($IconUri))
+    {
+        $ManifestArguments.PrivateData.PSData.IconUri = $IconUri
+    }
+
+    if (-not [string]::IsNullOrEmpty($ReleaseNotes))
+    {
+        $ManifestArguments.PrivateData.PSData.ReleaseNotes = $ReleaseNotes
+    }
+
+    if (-not [string]::IsNullOrEmpty($Prerelease))
+    {
+        $ManifestArguments.PrivateData.PSData.Prerelease = $Prerelease
+    }
+
+    if ($RequireLicenseAcceptance)
+    {
+        $ManifestArguments.PrivateData.PSData.RequireLicenseAcceptance = $true
+    }
+
+    if ($ExternalDependencies.Count -gt 0)
+    {
+        $ManifestArguments.PrivateData.PSData.ExternalModuleDependencies = $ExternalDependencies.ToArray()
+    }
+
+    if (-not [string]::IsNullOrEmpty($HelpInfoUri))
+    {
+        $ManifestArguments.HelpInfoUri = $HelpInfoUri
+    }
+
+    if (-not [string]::IsNullOrEmpty($DefaultCommandPrefix))
+    {
+        $ManifestArguments.DefaultCommandPrefix = $DefaultCommandPrefix
+    }
+
+    New-DataFile -Path $Path -Data $ManifestArguments
 }

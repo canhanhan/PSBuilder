@@ -50,6 +50,8 @@ param (
 
     [string]$DefaultCommandPrefix = $null,
 
+    [bool]$RequireLicenseAcceptance = $false,
+
     [object[]]$Dependencies = @(),
 
     [string]$DefaultDependencyRepository = "PSGallery",
@@ -234,6 +236,7 @@ Task "Compile" @{
             DefaultCommandPrefix = $DefaultCommandPrefix
             Dependencies = $Dependencies
             Prerelease = $VersionSuffix
+            RequireLicenseAcceptance = $RequireLicenseAcceptance
             LicenseUri = $LicenseUri
             ProjectUri = $ProjectUri
             IconUri = $IconUri
