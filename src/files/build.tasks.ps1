@@ -82,6 +82,10 @@ param (
 
     [string]$AnalysisSettingsFile = $null,
 
+    [string]$AnalysisResultsFile = $null,
+
+    [string]$AnalysisSummaryFile = $null,
+
     [string[]]$TestTags = @("*"),
 
     [string]$TestResultsFile = $null,
@@ -150,6 +154,8 @@ if ([string]::IsNullOrEmpty($SourceFilePath)) { $SourceFilePath = Join-Path -Pat
 if ([string]::IsNullOrEmpty($ManifestDestination)) { $ManifestDestination = Join-Path -Path $BuildOutput -ChildPath "$Name.psd1" }
 if ([string]::IsNullOrEmpty($MergedFilePath)) { $MergedFilePath = Join-Path -Path $BuildOutput -ChildPath "$Name.psm1" }
 if ([string]::IsNullOrEmpty($AnalysisSettingsFile)) { $AnalysisSettingsFile = Join-Path -Path $BuildRoot -ChildPath "PSScriptAnalyzerSettings.psd1" }
+if ([string]::IsNullOrEmpty($AnalysisResultsFile)) { $AnalysisResultsFile = Join-Path -Path $BuildOutputDirectory -ChildPath "AnalysisResults.xml" }
+if ([string]::IsNullOrEmpty($AnalysisSummaryFile)) { $AnalysisSummaryFile = Join-Path -Path $BuildOutputDirectory -ChildPath "AnalysisSummary.txt" }
 if ([string]::IsNullOrEmpty($ArchiveName)) { $ArchiveName = "$Name-$Version$VersionSuffix.zip" }
 if ([string]::IsNullOrEmpty($ArchiveDestination)) { $ArchiveDestination = Join-Path -Path $BuildOutputDirectory -ChildPath $ArchiveName }
 
@@ -264,7 +270,15 @@ Task "Compile" @{
 }
 
 Task "Analyze" "Compile", {
-    Invoke-CodeAnalysis -Path $BuildOutput -SettingsFile $AnalysisSettingsFile -FailureLevel $AnalysisFailureLevel
+    $analysisArgs = @{
+        Path = $BuildOutput
+        SettingsFile = $AnalysisSettingsFile
+        ResultsFile = $AnalysisResultsFile
+        SummaryFile = $AnalysisSummaryFile
+        FailureLevel = $AnalysisFailureLevel
+    }
+
+    Invoke-CodeAnalysis @analysisArgs
 }
 
 Task "Test" "Compile", {

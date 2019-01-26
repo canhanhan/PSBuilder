@@ -13,7 +13,8 @@ schema: 2.0.0
 ## SYNTAX
 
 ```
-Invoke-CodeAnalysis [-Path] <String> [[-FailureLevel] <String>] [[-SettingsFile] <String>] [<CommonParameters>]
+Invoke-CodeAnalysis [-Path] <String> [[-FailureLevel] <String>] [[-SettingsFile] <String>]
+ [-ResultsFile <String>] [-SummaryFile <String>] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -70,6 +71,36 @@ Aliases:
 
 Required: False
 Position: 2
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -ResultsFile
+{{Fill ResultsFile Description}}
+
+```yaml
+Type: String
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -SummaryFile
+{{Fill SummaryFile Description}}
+
+```yaml
+Type: String
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
 Default value: None
 Accept pipeline input: False
 Accept wildcard characters: False

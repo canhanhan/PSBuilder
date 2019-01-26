@@ -6,13 +6,18 @@ function Invoke-CodeAnalysis
 
         [string]$FailureLevel,
 
-        [string]$SettingsFile
+        [string]$SettingsFile,
+
+        [string]$ResultsFile,
+
+        [string]$SummaryFile
     )
 
     $analysisParameters = @{}
     if (-not [string]::IsNullOrEmpty($SettingsFile) -and (Test-Path -Path $SettingsFile)) { $analysisParameters["Settings"] = $SettingsFile }
     $analysisResult = Invoke-ScriptAnalyzer -Path $Path -Recurse @analysisParameters
-    $analysisResult | Format-Table | Out-String -Width 192
+    $analysisResult | Format-Table -AutoSize | Out-String | Tee-Object -FilePath $SummaryFile
+    ($analysisResult | ConvertTo-Xml -NoTypeInformation -Depth 3).Save($ResultsFile)
 
     $warnings = $analysisResult.Where({ $_.Severity -eq "Warning" -or $_.Severity -eq "Warning" }).Count
     $errors = $analysisResult.Where({ $_.Severity -eq "Error" }).Count
