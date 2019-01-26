@@ -24,6 +24,32 @@ param (
 
     [string[]]$Tags = @(),
 
+    [string[]]$CompatiblePSEditions = $null,
+
+    [string]$PowerShellVersion = $null,
+
+    [string]$PowerShellHostName = $null,
+
+    [string]$PowerShellHostVersion = $null,
+
+    [string]$DotNetFrameworkVersion = $null,
+
+    [string]$CLRVersion = $null,
+
+    [string]$ProcessorArchitecture = $null,
+
+    [string[]]$RequiredAssemblies = $null,
+
+    [string[]]$ScriptsToProcess = $null,
+
+    [string[]]$TypesToProcess = $null,
+
+    [string[]]$FormatsToProcess = $null,
+
+    [string[]]$NestedModules = $null,
+
+    [string]$DefaultCommandPrefix = $null,
+
     [object[]]$Dependencies = @(),
 
     [string]$DefaultDependencyRepository = "PSGallery",
@@ -187,6 +213,19 @@ Task "Compile" @{
             Description = $Description
             Guid = $Guid
             Version = $Version
+            CompatiblePSEditions = $CompatiblePSEditions
+            PowerShellVersion = $PowerShellVersion
+            PowerShellHostName = $PowerShellHostName
+            PowerShellHostVersion = $PowerShellHostVersion
+            DotNetFrameworkVersion = $DotNetFrameworkVersion
+            CLRVersion = $CLRVersion
+            ProcessorArchitecture = $ProcessorArchitecture
+            RequiredAssemblies = $RequiredAssemblies
+            ScriptsToProcess = $ScriptsToProcess
+            TypesToProcess = $TypesToProcess
+            FormatsToProcess = $FormatsToProcess
+            NestedModules = $NestedModules
+            DefaultCommandPrefix = $DefaultCommandPrefix
             Dependencies = $Dependencies
             Prerelease = $VersionSuffix
             LicenseUri = $LicenseUri

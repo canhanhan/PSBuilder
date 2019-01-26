@@ -16,7 +16,12 @@ schema: 2.0.0
 Invoke-CreateModuleManifest [-Name] <String> [-Guid] <String> [-Author] <String> [-Description] <String>
  [-Path] <String> [-ModuleFilePath] <String> [-Version] <String> [[-CompanyName] <String>]
  [[-Dependencies] <Object[]>] [[-LicenseUri] <String>] [[-IconUri] <String>] [[-ProjectUri] <String>]
- [-HelpInfoUri <String>] [[-Tags] <String[]>] [[-Prerelease] <String>] [<CommonParameters>]
+ [-HelpInfoUri <String>] [-CompatiblePSEditions <String[]>] [-PowerShellVersion <String>]
+ [-PowerShellHostName <String>] [-PowerShellHostVersion <String>] [-DotNetFrameworkVersion <String>]
+ [-CLRVersion <String>] [-ProcessorArchitecture <String>] [-RequiredAssemblies <String[]>]
+ [-ScriptsToProcess <String[]>] [-TypesToProcess <String[]>] [-FormatsToProcess <String[]>]
+ [-NestedModules <String[]>] [-DefaultCommandPrefix <String>] [[-Tags] <String[]>] [[-Prerelease] <String>]
+ [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -248,6 +253,201 @@ Accept wildcard characters: False
 
 ```yaml
 Type: String
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -CLRVersion
+{{Fill CLRVersion Description}}
+
+```yaml
+Type: String
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -CompatiblePSEditions
+{{Fill CompatiblePSEditions Description}}
+
+```yaml
+Type: String[]
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -DefaultCommandPrefix
+{{Fill DefaultCommandPrefix Description}}
+
+```yaml
+Type: String
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -DotNetFrameworkVersion
+{{Fill DotNetFrameworkVersion Description}}
+
+```yaml
+Type: String
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -FormatsToProcess
+{{Fill FormatsToProcess Description}}
+
+```yaml
+Type: String[]
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -NestedModules
+{{Fill NestedModules Description}}
+
+```yaml
+Type: String[]
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -PowerShellHostName
+{{Fill PowerShellHostName Description}}
+
+```yaml
+Type: String
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -PowerShellHostVersion
+{{Fill PowerShellHostVersion Description}}
+
+```yaml
+Type: String
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -PowerShellVersion
+{{Fill PowerShellVersion Description}}
+
+```yaml
+Type: String
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -ProcessorArchitecture
+{{Fill ProcessorArchitecture Description}}
+
+```yaml
+Type: String
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -RequiredAssemblies
+{{Fill RequiredAssemblies Description}}
+
+```yaml
+Type: String[]
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -ScriptsToProcess
+{{Fill ScriptsToProcess Description}}
+
+```yaml
+Type: String[]
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -TypesToProcess
+{{Fill TypesToProcess Description}}
+
+```yaml
+Type: String[]
 Parameter Sets: (All)
 Aliases:
 

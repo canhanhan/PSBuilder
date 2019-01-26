@@ -28,6 +28,19 @@ function Invoke-CreateModuleManifest
         [string]$IconUri = $null,
         [string]$ProjectUri = $null,
         [string]$HelpInfoUri = $null,
+        [string[]]$CompatiblePSEditions = $null,
+        [string]$PowerShellVersion = $null,
+        [string]$PowerShellHostName = $null,
+        [string]$PowerShellHostVersion = $null,
+        [string]$DotNetFrameworkVersion = $null,
+        [string]$CLRVersion = $null,
+        [string]$ProcessorArchitecture = $null,
+        [string[]]$RequiredAssemblies = $null,
+        [string[]]$ScriptsToProcess = $null,
+        [string[]]$TypesToProcess = $null,
+        [string[]]$FormatsToProcess = $null,
+        [string[]]$NestedModules = $null,
+        [string]$DefaultCommandPrefix = $null,
         [string[]]$Tags = $null,
         [string]$Prerelease = $null
     )
@@ -36,6 +49,7 @@ function Invoke-CreateModuleManifest
     $Exports = @{
         "Aliases" = @($module.ExportedAliases.Keys)
         "Cmdlets" = @($module.ExportedCmdlets.Keys)
+        "DscResources" = @($module.ExportedDscResources)
         "Functions" = @($module.ExportedFunctions.Keys)
         "Variables" = @($module.ExportedVariables.Keys)
     }
@@ -89,6 +103,11 @@ function Invoke-CreateModuleManifest
         $ManifestArguments.CmdletsToExport = $Exports.Cmdlets
     }
 
+    if ($Exports.DscResources.Count -gt 0)
+    {
+        $ManifestArguments.DscResourcesToExport = $Exports.DscResources
+    }
+
     if ($Exports.Functions.Count -gt 0)
     {
         $ManifestArguments.FunctionsToExport = $Exports.Functions
@@ -127,6 +146,71 @@ function Invoke-CreateModuleManifest
     if (-not [string]::IsNullOrEmpty($HelpInfoUri))
     {
         $ManifestArguments.HelpInfoUri = $HelpInfoUri
+    }
+
+    if ($null -ne $CompatiblePSEditions -and $CompatiblePSEditions.Count -gt 0)
+    {
+        $ManifestArguments.CompatiblePSEditions = $CompatiblePSEditions
+    }
+
+    if (-not [string]::IsNullOrEmpty($PowerShellVersion))
+    {
+        $ManifestArguments.PowerShellVersion = $PowerShellVersion
+    }
+
+    if (-not [string]::IsNullOrEmpty($PowerShellHostName))
+    {
+        $ManifestArguments.PowerShellHostName = $PowerShellHostName
+    }
+
+    if (-not [string]::IsNullOrEmpty($PowerShellHostVersion))
+    {
+        $ManifestArguments.PowerShellHostVersion = $PowerShellHostVersion
+    }
+
+    if (-not [string]::IsNullOrEmpty($DotNetFrameworkVersion))
+    {
+        $ManifestArguments.DotNetFrameworkVersion = $DotNetFrameworkVersion
+    }
+
+    if (-not [string]::IsNullOrEmpty($CLRVersion))
+    {
+        $ManifestArguments.CLRVersion = $CLRVersion
+    }
+
+    if (-not [string]::IsNullOrEmpty($ProcessorArchitecture))
+    {
+        $ManifestArguments.ProcessorArchitecture = $ProcessorArchitecture
+    }
+
+    if ($null -ne $RequiredAssemblies -and $RequiredAssemblies.Count -gt 0)
+    {
+        $ManifestArguments.RequiredAssemblies = $RequiredAssemblies
+    }
+
+    if ($null -ne $ScriptsToProcess -and $ScriptsToProcess.Count -gt 0)
+    {
+        $ManifestArguments.ScriptsToProcess = $ScriptsToProcess
+    }
+
+    if ($null -ne $TypesToProcess -and $TypesToProcess.Count -gt 0)
+    {
+        $ManifestArguments.TypesToProcess = $TypesToProcess
+    }
+
+    if ($null -ne $FormatsToProcess -and $FormatsToProcess.Count -gt 0)
+    {
+        $ManifestArguments.FormatsToProcess = $FormatsToProcess
+    }
+
+    if ($null -ne $NestedModules -and $NestedModules.Count -gt 0)
+    {
+        $ManifestArguments.NestedModules = $NestedModules
+    }
+
+    if (-not [string]::IsNullOrEmpty($DefaultCommandPrefix))
+    {
+        $ManifestArguments.DefaultCommandPrefix = $DefaultCommandPrefix
     }
 
     if (-not [string]::IsNullOrEmpty($Prerelease))
