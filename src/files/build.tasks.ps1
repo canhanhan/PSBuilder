@@ -8,6 +8,8 @@ param (
 
     [string]$VersionSuffix = $null,
 
+    [string]$VersionPrefix = "1.0",
+
     [string]$ProjectBuildFile = $null,
 
     [string]$BuildOutputDirectory = $null,
@@ -66,9 +68,9 @@ param (
 
     [bool]$PublishToArchive = $true,
 
-    [string]$PublishToArchiveName = $null,
+    [string]$ArchiveName = $null,
 
-    [string]$PublishToArchiveDestination = $null,
+    [string]$ArchiveDestination = $null,
 
     [bool]$PublishToAppveyor = (Test-Path -Path "Env:APPVEYOR_JOB_ID"),
 
@@ -84,6 +86,22 @@ param (
 if ([string]::IsNullOrEmpty($ProjectBuildFile)) { $ProjectBuildFile = Join-Path -Path $BuildRoot -ChildPath "build.ps1" }
 if (Test-Path -Path $ProjectBuildFile) { . $ProjectBuildFile }
 
+if ([string]::IsNullOrWhiteSpace($Version))
+{
+    if (-not [string]::IsNullOrWhiteSpace($ENV:APPVEYOR_BUILD_VERSION))
+    {
+        $Version = $ENV:APPVEYOR_BUILD_VERSION
+    }
+    elseif (-not [string]::IsNullOrWhiteSpace($ENV:BUILD_NUMBER))
+    {
+        $Version = "$VersionPrefix.$($ENV:BUILD_NUMBER)"
+    }
+    else
+    {
+        $Version = "$VersionPrefix.0"
+    }
+}
+
 if ([string]::IsNullOrEmpty($BuildOutputDirectory)) { $BuildOutputDirectory = Join-Path -Path $BuildRoot -ChildPath "output" }
 if ([string]::IsNullOrEmpty($BuildOutput)) { $BuildOutput = Join-Path -Path $BuildOutputDirectory -ChildPath $Name }
 if ([string]::IsNullOrEmpty($SourcePath)) { $SourcePath = Join-Path -Path $BuildRoot -ChildPath "src" }
@@ -96,8 +114,8 @@ if ([string]::IsNullOrEmpty($SourceFilePath)) { $SourceFilePath = Join-Path -Pat
 if ([string]::IsNullOrEmpty($ManifestDestination)) { $ManifestDestination = Join-Path -Path $BuildOutput -ChildPath "$Name.psd1" }
 if ([string]::IsNullOrEmpty($MergedFilePath)) { $MergedFilePath = Join-Path -Path $BuildOutput -ChildPath "$Name.psm1" }
 if ([string]::IsNullOrEmpty($AnalysisSettingsFile)) { $AnalysisSettingsFile = Join-Path -Path $BuildRoot -ChildPath "PSScriptAnalyzerSettings.psd1" }
-if ([string]::IsNullOrEmpty($PublishToArchiveName)) { $PublishToArchiveName = "$Name-$Version$VersionSuffix.zip" }
-if ([string]::IsNullOrEmpty($PublishToArchiveDestination)) { $PublishToArchiveDestination = Join-Path -Path $BuildOutputDirectory -ChildPath $PublishToArchiveName }
+if ([string]::IsNullOrEmpty($ArchiveName)) { $ArchiveName = "$Name-$Version$VersionSuffix.zip" }
+if ([string]::IsNullOrEmpty($ArchiveDestination)) { $ArchiveDestination = Join-Path -Path $BuildOutputDirectory -ChildPath $ArchiveName }
 
 Task "Clean" {
     Requires "BuildOutputDirectory"
@@ -137,18 +155,6 @@ Task "Compile" @{
         }
 
         Invoke-CompileModule -Name $Name -Source $SourcePath -Destination $MergedFilePath
-
-        if ([string]::IsNullOrWhiteSpace($Version))
-        {
-            if (-not [string]::IsNullOrWhiteSpace($ENV:APPVEYOR_BUILD_VERSION))
-            {
-                $Version = $ENV:APPVEYOR_BUILD_VERSION
-            }
-            else
-            {
-                $Version = "1.0.0"
-            }
-        }
 
         #Create module manifest
         $manifestArgs = @{
@@ -230,17 +236,15 @@ Task "Test" "Compile", {
     }
 }
 
-Task "Build" "Compile", "Analyze", "Test"
-Task "Publish" "Build", {
-    if ($PublishToArchive -or $PublishToAppveyor)
-    {
-        $PublishToArchiveDestination = [scriptblock]::Create("`"$PublishToArchiveDestination`"").Invoke()
-        Compress-Archive -Path $BuildOutput -DestinationPath $PublishToArchiveDestination -Force
+Task "Archive" "Compile", {
+    Compress-Archive -Path $BuildOutput -DestinationPath $ArchiveDestination -Force
+}
 
-        if ($PublishToAppveyor)
-        {
-            Push-AppveyorArtifact $PublishToArchiveDestination
-        }
+Task "Build" "Compile", "Archive", "Analyze", "Test"
+Task "Publish" "Build", {
+    if ($PublishToAppveyor)
+    {
+        Push-AppveyorArtifact $ArchiveDestination
     }
 
     if ($PublishToRepository)
