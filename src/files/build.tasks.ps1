@@ -52,6 +52,8 @@ param (
 
     [bool]$RequireLicenseAcceptance = $false,
 
+    [System.Collections.Specialized.OrderedDictionary]$PSData = $null,
+
     [object[]]$Dependencies = @(),
 
     [string]$DefaultDependencyRepository = "PSGallery",
@@ -244,6 +246,7 @@ Task "Compile" @{
             IconUri = $IconUri
             HelpInfoUri = $HelpInfoUri
             Tags = $Tags
+            PSData = $PSData
         }
         Invoke-CreateModuleManifest @manifestArgs
 

@@ -17,7 +17,7 @@ function ProcessValue($InputObject)
       }
       elseif ($InputObject.Count -eq 1)
       {
-            return "@($((ProcessValue $InputObject) -replace "`r`n", "`r`n`t"))"
+            return "@($((ProcessValue $InputObject[0]) -replace "`r`n", "`r`n`t"))"
       }
       else
       {

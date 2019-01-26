@@ -21,7 +21,8 @@ Invoke-CreateModuleManifest [-Name] <String> [-Guid] <String> [-Author] <String>
  [[-DotNetFrameworkVersion] <String>] [[-CLRVersion] <String>] [[-ProcessorArchitecture] <String>]
  [[-RequiredAssemblies] <String[]>] [[-ScriptsToProcess] <String[]>] [[-TypesToProcess] <String[]>]
  [[-FormatsToProcess] <String[]>] [[-NestedModules] <String[]>] [[-DefaultCommandPrefix] <String>]
- [[-Tags] <String[]>] [[-Prerelease] <String>] [[-RequireLicenseAcceptance] <Boolean>] [<CommonParameters>]
+ [[-Tags] <String[]>] [[-Prerelease] <String>] [-PSData <OrderedDictionary>]
+ [[-RequireLicenseAcceptance] <Boolean>] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -483,6 +484,21 @@ Aliases:
 
 Required: True
 Position: 6
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -PSData
+{{Fill PSData Description}}
+
+```yaml
+Type: OrderedDictionary
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
 Default value: None
 Accept pipeline input: False
 Accept wildcard characters: False

@@ -44,6 +44,7 @@ function Invoke-CreateModuleManifest
         [string]$DefaultCommandPrefix = $null,
         [string[]]$Tags = $null,
         [string]$Prerelease = $null,
+        [System.Collections.Specialized.OrderedDictionary]$PSData = $null,
         [bool]$RequireLicenseAcceptance=$false
     )
 
@@ -235,6 +236,14 @@ function Invoke-CreateModuleManifest
     if (-not [string]::IsNullOrEmpty($DefaultCommandPrefix))
     {
         $ManifestArguments.DefaultCommandPrefix = $DefaultCommandPrefix
+    }
+
+    if ($null -ne $PSData -and $PSData.Count -gt 0)
+    {
+        foreach ($key in $PSData.Keys)
+        {
+            $ManifestArguments.PrivateData.PSData.Add($key, $PSData[$key])
+        }
     }
 
     New-DataFile -Path $Path -Data $ManifestArguments
