@@ -1,8 +1,6 @@
 param ($Action="Build")
 
-$isDotSourced = $MyInvocation.InvocationName -eq '.' -or $MyInvocation.Line -eq ''
-
-if ($isDotSourced)
+if ($MyInvocation.InvocationName -eq '.')
 {
     $Name = 'PSBuilder'
     $Guid = '4e489c66-8a1a-11e8-9a94-a6cf71072f73'
