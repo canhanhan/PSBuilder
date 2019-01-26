@@ -22,9 +22,12 @@ function Invoke-CreateModuleManifest
         [Parameter(Mandatory=$true)]
         [string]$Version,
 
+        [string]$CompanyName = $null,
+        [object[]]$Dependencies,
         [string]$LicenseUri = $null,
         [string]$IconUri = $null,
         [string]$ProjectUri = $null,
+        [string]$HelpInfoUri = $null,
         [string[]]$Tags = $null,
         [string]$Prerelease = $null
     )
@@ -37,43 +40,109 @@ function Invoke-CreateModuleManifest
         "Variables" = @($module.ExportedVariables.Keys)
     }
 
+    $GalleryDependencies = [System.Collections.ArrayList]::new()
+    $ExternalDependencies = [System.Collections.ArrayList]::new()
+
+    foreach ($dependencyLine in $Dependencies)
+    {
+        $dependency = Convert-Dependency -InputObject $dependencyLine
+
+        if ($dependency.External)
+        {
+            [void]$ExternalDependencies.Add($dependency.Name)
+        }
+
+        if ($dependency.ContainsKey("Repository")) { $dependency.Remove("Repository") }
+        if ($dependency.ContainsKey("MinimumVersion"))
+        {
+            $dependency["ModuleVersion"] = $dependency["MinimumVersion"]
+            $dependency.Remove("MinimumVersion")
+        }
+        $dependency["ModuleName"] = $dependency["Name"]
+        $dependency.Remove("Name")
+        $dependency.Remove("External")
+
+        [void]$GalleryDependencies.Add([Microsoft.PowerShell.Commands.ModuleSpecification]::new($dependency))
+    }
+
     $ManifestArguments = @{
         "RootModule" = "$Name.psm1"
         "Guid" = $Guid
         "Author" = $Author
         "Description" = $Description
         "Copyright" = "(c) $((Get-Date).Year) $Author. All rights reserved."
-        "AliasesToExport" = $Exports.Aliases
-        "CmdletsToExport" = $Exports.Cmdlets
-        "FunctionsToExport" = $Exports.Functions
-        "VariablesToExport" = $Exports.Variables
         "ModuleVersion" = $Version
     }
 
-    if ($PSBoundParameters.ContainsKey("LicenseUri"))
+    if (-not [string]::IsNullOrEmpty($CompanyName))
+    {
+        $ManifestArguments.CompanyName = $CompanyName
+    }
+
+    if ($Exports.Aliases.Count -gt 0)
+    {
+        $ManifestArguments.AliasesToExport = $Exports.Aliases
+    }
+
+    if ($Exports.Cmdlets.Count -gt 0)
+    {
+        $ManifestArguments.CmdletsToExport = $Exports.Cmdlets
+    }
+
+    if ($Exports.Functions.Count -gt 0)
+    {
+        $ManifestArguments.FunctionsToExport = $Exports.Functions
+    }
+
+    if ($Exports.Variables.Count -gt 0)
+    {
+        $ManifestArguments.VariablesToExport = $Exports.Variables
+    }
+
+    if ($GalleryDependencies.Count -gt 0)
+    {
+        $ManifestArguments.RequiredModules = $GalleryDependencies.ToArray()
+    }
+
+    if ($ExternalDependencies.Count -gt 0)
+    {
+        $ManifestArguments.ExternalModuleDependencies = $ExternalDependencies.ToArray()
+    }
+
+    if (-not [string]::IsNullOrEmpty($LicenseUri))
     {
         $ManifestArguments.LicenseUri = $LicenseUri
     }
 
-    if ($PSBoundParameters.ContainsKey("ProjectUri"))
+    if (-not [string]::IsNullOrEmpty($ProjectUri))
     {
         $ManifestArguments.ProjectUri = $ProjectUri
     }
 
-    if ($PSBoundParameters.ContainsKey("IconUri"))
+    if (-not [string]::IsNullOrEmpty($IconUri))
     {
         $ManifestArguments.IconUri = $IconUri
     }
 
-    if ($PSBoundParameters.ContainsKey("Tags") -and $Tags.Count -gt 0)
+    if (-not [string]::IsNullOrEmpty($HelpInfoUri))
+    {
+        $ManifestArguments.HelpInfoUri = $HelpInfoUri
+    }
+
+    if (-not [string]::IsNullOrEmpty($Prerelease))
+    {
+        $ManifestArguments.Prerelease = $Prerelease
+    }
+
+    if ($null -ne $Tags -and $Tags.Count -gt 0)
     {
         $ManifestArguments.Tags = $Tags
     }
 
-    New-ModuleManifest -Path $Path @ManifestArguments
-
-    if ($PSBoundParameters.ContainsKey("Prerelease"))
+    if (-not (Test-Path -Path $Path))
     {
-        Update-ModuleManifest -Path $Path -Prerelease $Prerelease
+        New-ModuleManifest -Path $Path -VariablesToExport @()
     }
+
+    Update-ModuleManifest -Path $Path @ManifestArguments
 }

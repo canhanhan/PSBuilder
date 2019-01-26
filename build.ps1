@@ -10,6 +10,14 @@ if ($isDotSourced)
     $Description = 'PSBuilder provides re-usable, shared build tasks for building Powershell modules and scripts.'
     $PublishToRepositoryName = "PSGallery"
     $PublishToRepository = ($Env:APPVEYOR_REPO_BRANCH -eq "master")
+    $ProjectUri = "https://github.com/finarfin/PSBuilder"
+    $LicenseUri = "https://github.com/finarfin/PSBuilder/blob/master/LICENSE"
+    $HelpInfoUri = "https://github.com/finarfin/PSBuilder/blob/master/docs/PSBuilder.md"
+    $Dependencies = @(
+        @{ Name="InvokeBuild"; MinimumVersion="5.4.2" },
+        @{ Name="Pester"; MinimumVersion="4.6.0" },
+        @{ Name="platyPS"; MinimumVersion="0.12.0" }
+    )
 }
 else
 {

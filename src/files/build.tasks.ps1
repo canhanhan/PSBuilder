@@ -10,6 +10,24 @@ param (
 
     [string]$VersionPrefix = "1.0",
 
+    [string]$Author = $null,
+
+    [string]$CompanyName = $null,
+
+    [string]$LicenseUri = $null,
+
+    [string]$ProjectUri = $null,
+
+    [string]$IconUri = $null,
+
+    [string]$HelpInfoUri = $null,
+
+    [string[]]$Tags = @(),
+
+    [object[]]$Dependencies = @(),
+
+    [string]$DefaultDependencyRepository = "PSGallery",
+
     [string]$ProjectBuildFile = $null,
 
     [string]$BuildOutputDirectory = $null,
@@ -72,15 +90,7 @@ param (
 
     [string]$ArchiveDestination = $null,
 
-    [bool]$PublishToAppveyor = (Test-Path -Path "Env:APPVEYOR_JOB_ID"),
-
-    [string]$LicenseUri = $null,
-
-    [string]$ProjectUri = $null,
-
-    [string]$IconUri = $null,
-
-    [string[]]$Tags = @()
+    [bool]$PublishToAppveyor = (Test-Path -Path "Env:APPVEYOR_JOB_ID")
 )
 
 if ([string]::IsNullOrEmpty($ProjectBuildFile)) { $ProjectBuildFile = Join-Path -Path $BuildRoot -ChildPath "build.ps1" }
@@ -116,6 +126,17 @@ if ([string]::IsNullOrEmpty($MergedFilePath)) { $MergedFilePath = Join-Path -Pat
 if ([string]::IsNullOrEmpty($AnalysisSettingsFile)) { $AnalysisSettingsFile = Join-Path -Path $BuildRoot -ChildPath "PSScriptAnalyzerSettings.psd1" }
 if ([string]::IsNullOrEmpty($ArchiveName)) { $ArchiveName = "$Name-$Version$VersionSuffix.zip" }
 if ([string]::IsNullOrEmpty($ArchiveDestination)) { $ArchiveDestination = Join-Path -Path $BuildOutputDirectory -ChildPath $ArchiveName }
+
+Task "Dependencies" {
+    foreach ($dependencyLine in $Dependencies)
+    {
+        $dependency = Convert-Dependency -InputObject $dependencyLine -Repository $DefaultDependencyRepository
+        if ($dependency.External) { continue }
+
+        $dependency.Remove("External")
+        Install-Module @dependency
+    }
+}
 
 Task "Clean" {
     Requires "BuildOutputDirectory"
@@ -162,36 +183,18 @@ Task "Compile" @{
             Path = $ManifestDestination
             ModuleFilePath = $MergedFilePath
             Author = $Author
+            CompanyName = $CompanyName
             Description = $Description
             Guid = $Guid
             Version = $Version
+            Dependencies = $Dependencies
+            Prerelease = $VersionSuffix
+            LicenseUri = $LicenseUri
+            ProjectUri = $ProjectUri
+            IconUri = $IconUri
+            HelpInfoUri = $HelpInfoUri
+            Tags = $Tags
         }
-
-        if (-not [string]::IsNullOrEmpty($VersionSuffix))
-        {
-            $manifestArgs.Prerelease = $VersionSuffix
-        }
-
-        if (-not [string]::IsNullOrEmpty($LicenseUri))
-        {
-            $manifestArgs.LicenseUri = $LicenseUri
-        }
-
-        if (-not [string]::IsNullOrEmpty($ProjectUri))
-        {
-            $manifestArgs.ProjectUri = $ProjectUri
-        }
-
-        if (-not [string]::IsNullOrEmpty($IconUri))
-        {
-            $manifestArgs.IconUri = $IconUri
-        }
-
-        if ($null -ne $Tags -and $Tags.Count -gt 0)
-        {
-            $manifestArgs.Tags = $Tags
-        }
-
         Invoke-CreateModuleManifest @manifestArgs
 
         #Create module documentation
