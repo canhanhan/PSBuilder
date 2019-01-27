@@ -20,5 +20,5 @@ function Invoke-CreateMarkdown
         New-MarkdownHelp -Module $($module.Name) -OutputFolder $Path -WithModulePage | Out-Null
     }
 
-    Update-MarkdownHelpModule -Path $Path -RefreshModulePage | Out-Null
+    Update-MarkdownHelpModule -Path $Path -RefreshModulePage -Force | Out-Null
 }
