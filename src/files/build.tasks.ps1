@@ -186,7 +186,7 @@ Task "Clean" {
 }
 
 Task "Compile" @{
-    Inputs = { Get-ChildItem $SourcePath -Recurse -Include "*.ps1","*.psm1","*.psd1" -Exclude "TempPSBuilder.psm1" }
+    Inputs = { @(Get-ChildItem $SourcePath -Recurse -Include "*.*" -Exclude "TempPSBuilder.psm1" -File) + @(Get-Item "build.ps1") }
     Outputs = { $MergedFilePath }
     Jobs = {
         Requires "BuildOutput", "FilesPath", "LicensePath"
