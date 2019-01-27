@@ -15,7 +15,7 @@ function ProcessValue($InputObject)
       {
             return '@()'
       }
-      elseif ($InputObject.Count -eq 1)
+      elseif ($InputObject.Count -eq 1 -and $InputObject[0] -isnot [hashtable] -and $InputObject[0] -isnot [System.Collections.Specialized.OrderedDictionary])
       {
             return "@($((ProcessValue $InputObject[0]) -replace "`r`n", "`r`n`t"))"
       }
@@ -40,7 +40,9 @@ function ProcessValue($InputObject)
         [void]$hashtableBuilder.AppendLine("@{")
         foreach ($key in @($InputObject.Keys))
         {
-            [void]$hashtableBuilder.AppendLine("`t$key = $((ProcessValue $InputObject[$key]) -replace "`r`n", "`r`n`t")")
+            $value = (ProcessValue $InputObject[$key]) -replace "`r`n", "`r`n`t"
+            $value = $value -replace "`r`n`t$", ""
+            [void]$hashtableBuilder.AppendLine("`t$key = $value")
         }
         [void]$hashtableBuilder.AppendLine("}")
         return $hashtableBuilder.ToString()
