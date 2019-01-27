@@ -172,7 +172,7 @@ Task "Dependencies" {
         if ($dependency.External) { continue }
 
         $dependency.Remove("External")
-        Install-Module @dependency
+        Install-Module @dependency -Force
     }
 }
 
