@@ -151,7 +151,7 @@ Describe_WithSampleModule "Test" {
     Context "Has tests folder but no files in" {
         BeforeEach {
             Mock "Invoke-Pester" -Verifiable -ModuleName "PSBuilder" {
-                [pscustomobject]@{ "FailedCount" = 0; "CodeCoverage"= [pscustomobject]@{ "NumberOfCommandsAnalyzed"= 0; "NumberOfCommandsExecuted"=0 } }
+                [pscustomobject]@{ "FailedCount" = 0; "CodeCoverage"= [pscustomobject]@{ "NumberOfCommandsAnalyzed"= 0; "NumberOfCommandsExecuted"=0; "MissedCommands" = @() } }
             }
         }
 
@@ -163,7 +163,7 @@ Describe_WithSampleModule "Test" {
     Context "Has passing tests" {
         BeforeEach {
             Mock "Invoke-Pester" -Verifiable -ModuleName "PSBuilder" {
-                [pscustomobject]@{ "FailedCount" = 0; "CodeCoverage"= [pscustomobject]@{ "NumberOfCommandsAnalyzed"= 2; "NumberOfCommandsExecuted"=1 } }
+                [pscustomobject]@{ "FailedCount" = 0; "CodeCoverage"= [pscustomobject]@{ "NumberOfCommandsAnalyzed"= 2; "NumberOfCommandsExecuted"=1; "MissedCommands" = @() } }
             }
         }
 
@@ -193,7 +193,7 @@ Describe_WithSampleModule "Test" {
     Context "Has failing tests" {
         BeforeEach {
             Mock "Invoke-Pester" -Verifiable -ModuleName "PSBuilder" {
-                [pscustomobject]@{ "FailedCount" = 1; "CodeCoverage"= [pscustomobject]@{ "NumberOfCommandsAnalyzed"= 0; "NumberOfCommandsExecuted"=0 } }
+                [pscustomobject]@{ "FailedCount" = 1; "CodeCoverage"= [pscustomobject]@{ "NumberOfCommandsAnalyzed"= 0; "NumberOfCommandsExecuted"=0; "MissedCommands" = @() } }
             }
         }
 

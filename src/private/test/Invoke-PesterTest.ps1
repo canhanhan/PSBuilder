@@ -37,13 +37,18 @@ function Invoke-PesterTest
         if (0 -eq $testResult.CodeCoverage.NumberOfCommandsAnalyzed)
         {
             $testCoverage = 0
+            $codeCoverageSummary = ""
         }
         else
         {
             $testCoverage = [int]($testResult.CodeCoverage.NumberOfCommandsExecuted / $testResult.CodeCoverage.NumberOfCommandsAnalyzed * 100)
+
+            Write-Warning $testResult.CodeCoverage.GetType()
+            Write-Host ($testResult.CodeCoverage | ConvertTo-Json)
+            $codeCoverageSummary = $testResult.CodeCoverage.MissedCommands | Format-Table -AutoSize @{Name="File";Expr={ [IO.Path]::GetFileName($_.File) }}, Function, Line, Command | Out-String
         }
 
-        $codeCoverageSummary = $testResult.CodeCoverage.MissedCommands | Format-Table -AutoSize @{Name="File";Expr={ [IO.Path]::GetFileName($_.File) }}, Function, Line, Command | Out-String
+
         [IO.File]::WriteAllText($CoverageSummaryPath, "Code coverage: ${testCoverage}%`r`n`r`n$codeCoverageSummary")
     }
 
