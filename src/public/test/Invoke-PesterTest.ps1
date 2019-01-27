@@ -6,6 +6,7 @@ function Invoke-PesterTest
         [string]$Module,
         [string]$OutputPath,
         [string]$CoverageOutputPath,
+        [string]$CoverageSummaryPath,
         [int]$MinCoverage=0
     )
 
@@ -41,6 +42,9 @@ function Invoke-PesterTest
         {
             $testCoverage = [int]($testResult.CodeCoverage.NumberOfCommandsExecuted / $testResult.CodeCoverage.NumberOfCommandsAnalyzed * 100)
         }
+
+        $codeCoverageSummary = $testResult.CodeCoverage.MissedCommands | Format-Table -AutoSize @{Name="File";Expr={ [IO.Path]::GetFileName($_.File) }}, Function, Line, Command | Out-String
+        [IO.File]::WriteAllText($CoverageSummaryPath, "Code coverage: ${testCoverage}%`r`n`r`n$codeCoverageSummary")
     }
 
     Write-Output "Code coverage: ${testCoverage}%"

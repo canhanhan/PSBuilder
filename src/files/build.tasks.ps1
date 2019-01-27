@@ -98,6 +98,8 @@ param (
 
     [string]$CoverageResultsFile = $null,
 
+    [string]$CoverageSummaryPath = $null,
+
     [bool]$UploadTestResultsToAppveyor = (Test-Path -Path "Env:APPVEYOR_JOB_ID"),
 
     [string[]]$ExtensionsToSign = ("*.ps1", "*.psd1", "*.psm1"),
@@ -155,6 +157,7 @@ if ([string]::IsNullOrEmpty($DocumentationPath)) { $DocumentationPath = Join-Pat
 if ([string]::IsNullOrEmpty($TestsPath)) { $TestsPath = Join-Path -Path $BuildRoot -ChildPath "tests" }
 if ([string]::IsNullOrEmpty($TestResultsFile)) { $TestResultsFile = Join-Path -Path $BuildOutputDirectory -ChildPath "TestResults.xml" }
 if ([string]::IsNullOrEmpty($CoverageResultsFile)) { $CoverageResultsFile = Join-Path -Path $BuildOutputDirectory -ChildPath "CoverageResults.xml" }
+if ([string]::IsNullOrEmpty($CoverageSummaryPath)) { $CoverageSummaryPath = Join-Path -Path $BuildOutputDirectory -ChildPath "CoverageSummary.txt" }
 if ([string]::IsNullOrEmpty($LicensePath)) { $LicensePath = Join-Path -Path $BuildRoot -ChildPath "LICENSE" }
 if ([string]::IsNullOrEmpty($SourceFilePath)) { $SourceFilePath = Join-Path -Path $SourcePath -ChildPath "$Name.psm1" }
 if ([string]::IsNullOrEmpty($ManifestDestination)) { $ManifestDestination = Join-Path -Path $BuildOutput -ChildPath "$Name.psd1" }
@@ -293,7 +296,16 @@ Task "Analyze" "Compile", {
 }
 
 Task "Test" "Compile", {
-    Invoke-PesterTest -Path $TestsPath -Tags $TestTags -Module $ManifestDestination -OutputPath $TestResultsFile -MinCoverage $CodeCoverageMin -CoverageOutputPath $CoverageResultsFile
+    $pesterArgs = @{
+        Path = $TestsPath
+        Tags = $TestTags
+        Module = $ManifestDestination
+        OutputPath = $TestResultsFile
+        MinCoverage = $CodeCoverageMin
+        CoverageOutputPath = $CoverageResultsFile
+        CoverageSummaryPath = $CoverageSummaryPath
+    }
+    Invoke-PesterTest @pesterArgs
 
     if (-not [string]::IsNullOrEmpty($TestResultsFile))
     {

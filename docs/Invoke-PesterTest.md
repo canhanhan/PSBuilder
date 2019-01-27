@@ -14,7 +14,7 @@ schema: 2.0.0
 
 ```
 Invoke-PesterTest [[-Tags] <String[]>] [[-Path] <String>] [[-Module] <String>] [[-OutputPath] <String>]
- [[-CoverageOutputPath] <String>] [[-MinCoverage] <Int32>] [<CommonParameters>]
+ [[-CoverageOutputPath] <String>] [-CoverageSummaryPath <String>] [[-MinCoverage] <Int32>] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -116,6 +116,21 @@ Aliases:
 
 Required: False
 Position: 0
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -CoverageSummaryPath
+{{Fill CoverageSummaryPath Description}}
+
+```yaml
+Type: String
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
 Default value: None
 Accept pipeline input: False
 Accept wildcard characters: False
