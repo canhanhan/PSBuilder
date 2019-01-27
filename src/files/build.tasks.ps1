@@ -256,14 +256,8 @@ Task "Compile" @{
         if ($CreateDocumentation)
         {
             #Create module documentation
-            $modulePath = $MyInvocation.MyCommand.ScriptBlock.Module.Path
-            Start-Job -ScriptBlock {
-                Import-Module -Name $using:modulePath | Out-Null
-                Import-Module -Name $using:ManifestDestination | Out-Null
-
-                Invoke-CreateMarkdown -Path $using:DocumentationPath -Manifest $using:ManifestDestination
-                Invoke-CreateHelp -Source $using:DocumentationPath -Destination $using:BuildOutput
-            } | Receive-Job -Wait -AutoRemoveJob
+            Invoke-CreateMarkdown -Path $DocumentationPath -Manifest $ManifestDestination
+            Invoke-CreateHelp -Source $DocumentationPath -Destination $BuildOutput
         }
 
         #Sign module files

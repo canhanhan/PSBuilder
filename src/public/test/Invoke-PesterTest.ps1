@@ -18,19 +18,25 @@ function Invoke-PesterTest
     }
     else
     {
-        Set-Location -Path $Path
-        Import-Module -Name $Module -Force
-        $files = @(Get-ChildItem -Path ([IO.Path]::GetDirectoryName($Module)) -Include "*.ps1","*.psm1" -File -Recurse)
-        $pesterArgs = @{
-            CodeCoverage = $files
-            Tag = $tags
-            OutputFile = $OutputPath
-            OutputFormat = "NUnitXml"
-            CodeCoverageOutputFile = $CoverageOutputPath
-            CodeCoverageOutputFileFormat = "JaCoCo"
-            PassThru = $true
-        }
-        $testResult = Invoke-Pester @pesterArgs
+        $testResult = Start-Job -ScriptBlock {
+            Set-StrictMode -Version Latest
+            $ErrorActionPreference = "Stop"
+
+            Set-Location -Path $using:Path
+            Import-Module -Name $using:Module -Force
+            $files = @(Get-ChildItem -Path ([IO.Path]::GetDirectoryName($using:Module)) -Include "*.ps1","*.psm1" -File -Recurse)
+            $pesterArgs = @{
+                CodeCoverage = $files
+                Tag = $using:Tags
+                OutputFile = $using:OutputPath
+                OutputFormat = "NUnitXml"
+                CodeCoverageOutputFile = $using:CoverageOutputPath
+                CodeCoverageOutputFileFormat = "JaCoCo"
+                PassThru = $true
+            }
+
+            Invoke-Pester @pesterArgs
+        } | Receive-Job -Wait -AutoRemoveJob
 
         assert ($testResult.FailedCount -eq 0) ('Failed {0} Unit tests. Aborting Build' -f $testResult.FailedCount)
 

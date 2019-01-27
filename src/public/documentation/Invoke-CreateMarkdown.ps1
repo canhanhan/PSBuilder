@@ -8,17 +8,19 @@ function Invoke-CreateMarkdown
         [string]$Path
     )
 
-    $module = Import-Module -Name $Manifest -Global -Force -PassThru
-    if (-not (Test-Path -Path $Path))
-    {
-        New-Item -Path $Path -ItemType Directory -Force | Out-Null
-    }
+    Start-Job -ScriptBlock {
+        $module = Import-Module -Name $using:Manifest -Global -Force -PassThru
+        if (-not (Test-Path -Path $using:Path))
+        {
+            New-Item -Path $using:Path -ItemType Directory -Force | Out-Null
+        }
 
-    $moduleFile = Join-Path -Path $Path -ChildPath "$($module.Name).md"
-    if (-not (Test-Path -Path $moduleFile))
-    {
-        New-MarkdownHelp -Module $($module.Name) -OutputFolder $Path -WithModulePage | Out-Null
-    }
+        $moduleFile = Join-Path -Path $using:Path -ChildPath "$($module.Name).md"
+        if (-not (Test-Path -Path $moduleFile))
+        {
+            New-MarkdownHelp -Module $($module.Name) -OutputFolder $using:Path -WithModulePage | Out-Null
+        }
 
-    Update-MarkdownHelpModule -Path $Path -RefreshModulePage -Force | Out-Null
+        Update-MarkdownHelpModule -Path $using:Path -RefreshModulePage -Force | Out-Null
+    } | Receive-Job -Wait -AutoRemoveJob
 }
