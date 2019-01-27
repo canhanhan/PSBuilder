@@ -9,7 +9,7 @@ function ProcessValue($InputObject)
   {
         return ReplaceString $InputObject
   }
-  elseif ($InputObject -is [object[]])
+  elseif ($InputObject -is [array])
   {
       if ($InputObject.Count -eq 0)
       {
