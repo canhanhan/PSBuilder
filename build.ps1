@@ -19,7 +19,7 @@ if ($MyInvocation.InvocationName -eq '.')
 }
 else
 {
-    . "$PSScriptRoot/src/public/build/Invoke-CompileModule.ps1"
+    . "$PSScriptRoot/src/private/build/Invoke-CompileModule.ps1"
     Invoke-CompileModule -Name "PSBuilder" -Source "$PSScriptRoot/src" -Destination "$PSScriptRoot/src/TempPSBuilder.psm1"
     Import-Module -Name "$PSScriptRoot/src/TempPSBuilder.psm1" -Force
     Invoke-Builder $Action -ExitOnError
