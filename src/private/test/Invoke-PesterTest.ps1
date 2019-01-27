@@ -23,7 +23,7 @@ function Invoke-PesterTest
         $files = @(Get-ChildItem -Path ([IO.Path]::GetDirectoryName($Module)) -Include "*.ps1","*.psm1" -File -Recurse)
         $pesterArgs = @{
             CodeCoverage = $files
-            Tag = $using:Tags
+            Tag = $Tags
             OutputFile = $OutputPath
             OutputFormat = "NUnitXml"
             CodeCoverageOutputFile = $CoverageOutputPath
