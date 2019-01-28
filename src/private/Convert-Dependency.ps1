@@ -9,7 +9,7 @@ function Convert-Dependency
 
     if ($InputObject -is [string])
     {
-        $dependency = @{ Name = $dependency }
+        $dependency = @{ Name = $InputObject }
     }
     elseif ($InputObject -is [hashtable])
     {
