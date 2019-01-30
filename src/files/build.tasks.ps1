@@ -92,6 +92,8 @@ param (
 
     [string]$AnalysisSummaryFile = $null,
 
+    [bool]$AllowFailingTests = $false,
+
     [string[]]$TestTags = @("*"),
 
     [string]$TestResultsFile = $null,
@@ -131,6 +133,9 @@ param (
     [bool]$PublishToAppveyor = (Test-Path -Path "Env:APPVEYOR_JOB_ID")
 )
 
+Set-StrictMode -Version Latest
+$ErrorActionPreference = "Stop"
+
 if ([string]::IsNullOrEmpty($ProjectBuildFile)) { $ProjectBuildFile = Join-Path -Path $BuildRoot -ChildPath "build.ps1" }
 if (Test-Path -Path $ProjectBuildFile) { . $ProjectBuildFile }
 
@@ -165,17 +170,28 @@ if ([string]::IsNullOrEmpty($MergedFilePath)) { $MergedFilePath = Join-Path -Pat
 if ([string]::IsNullOrEmpty($AnalysisSettingsFile)) { $AnalysisSettingsFile = Join-Path -Path $BuildRoot -ChildPath "PSScriptAnalyzerSettings.psd1" }
 if ([string]::IsNullOrEmpty($AnalysisResultsFile)) { $AnalysisResultsFile = Join-Path -Path $BuildOutputDirectory -ChildPath "AnalysisResults.xml" }
 if ([string]::IsNullOrEmpty($AnalysisSummaryFile)) { $AnalysisSummaryFile = Join-Path -Path $BuildOutputDirectory -ChildPath "AnalysisSummary.txt" }
-if ([string]::IsNullOrEmpty($ArchiveName)) { $ArchiveName = "$Name-$Version$VersionSuffix.zip" }
+if ([string]::IsNullOrEmpty($ArchiveName)) { $ArchiveName = "$Name-$$Version$VersionSuffix.zip" }
 if ([string]::IsNullOrEmpty($ArchiveDestination)) { $ArchiveDestination = Join-Path -Path $BuildOutputDirectory -ChildPath $ArchiveName }
 
 Task "Dependencies" {
     foreach ($dependencyLine in $Dependencies)
     {
         $dependency = Convert-Dependency -InputObject $dependencyLine -Repository $DefaultDependencyRepository
-        if ($dependency.External) { continue }
+        $moduleArgs = [hashtable]::new($dependency)
+        $moduleArgs.Remove("External")
+        if ($moduleArgs.ContainsKey("Repository")) { $moduleArgs.Remove("Repository") }
 
-        $dependency.Remove("External")
-        Install-Module @dependency -Force
+        $module = Import-Module -PassThru -ErrorAction SilentlyContinue @moduleArgs
+        if (-not $dependency.External -and $null -eq $module)
+        {
+            $dependency.Remove("External")
+
+            Write-Host "Installing: $($dependency|ConvertTo-Json)"
+            Install-Module @dependency -Force
+            Write-Verbose "Installed $($moduleArgs.Name)"
+        }
+
+        Import-Module @moduleArgs
     }
 }
 
@@ -191,7 +207,7 @@ Task "Clean" {
 Task "Compile" @{
     Inputs = { @(Get-ChildItem $SourcePath -Recurse -Include "*.*" -Exclude "TempPSBuilder.psm1" -File) + @(Get-Item "build.ps1") }
     Outputs = { $MergedFilePath }
-    Jobs = {
+    Jobs = "Dependencies", {
         Requires "BuildOutput", "FilesPath", "LicensePath"
 
         #Create output directory
@@ -298,6 +314,7 @@ Task "Test" "Compile", {
         MinCoverage = $CodeCoverageMin
         CoverageOutputPath = $CoverageResultsFile
         CoverageSummaryPath = $CoverageSummaryPath
+        AllowFailingTests = $AllowFailingTests
     }
     Invoke-PesterTest @pesterArgs
 
@@ -310,7 +327,7 @@ Task "Test" "Compile", {
 }
 
 Task "Archive" "Compile", {
-    Compress-Archive -Path $BuildOutput -DestinationPath $ArchiveDestination -Force
+    #Compress-Archive -Path $BuildOutput -DestinationPath $ArchiveDestination -Force
 }
 
 Task "Build" "Compile", "Archive", "Analyze", "Test"

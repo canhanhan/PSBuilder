@@ -7,7 +7,8 @@ function Invoke-PesterTest
         [string]$OutputPath,
         [string]$CoverageOutputPath,
         [string]$CoverageSummaryPath,
-        [int]$MinCoverage=0
+        [int]$MinCoverage=0,
+        [bool]$AllowFailingTests=$false
     )
 
     if ($Tags -eq "*") { $Tags = @() }
@@ -32,7 +33,10 @@ function Invoke-PesterTest
         }
         $testResult = Invoke-Pester @pesterArgs
 
-        assert ($testResult.FailedCount -eq 0) ('Failed {0} Unit tests. Aborting Build' -f $testResult.FailedCount)
+        if (-not $AllowFailingTests)
+        {
+            assert ($testResult.FailedCount -eq 0) ('Failed {0} Unit tests. Aborting Build' -f $testResult.FailedCount)
+        }
 
         if (0 -eq $testResult.CodeCoverage.NumberOfCommandsAnalyzed)
         {
@@ -42,9 +46,6 @@ function Invoke-PesterTest
         else
         {
             $testCoverage = [int]($testResult.CodeCoverage.NumberOfCommandsExecuted / $testResult.CodeCoverage.NumberOfCommandsAnalyzed * 100)
-
-            Write-Warning $testResult.CodeCoverage.GetType()
-            Write-Host ($testResult.CodeCoverage | ConvertTo-Json)
             $codeCoverageSummary = $testResult.CodeCoverage.MissedCommands | Format-Table -AutoSize @{Name="File";Expr={ [IO.Path]::GetFileName($_.File) }}, Function, Line, Command | Out-String
         }
 
