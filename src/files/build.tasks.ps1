@@ -6,7 +6,7 @@ param (
 
     [string]$Version = $null,
 
-    [string]$VersionSuffix = $null,
+    [string]$Prerelease = $null,
 
     [string]$VersionPrefix = "1.0",
 
@@ -170,7 +170,7 @@ if ([string]::IsNullOrEmpty($MergedFilePath)) { $MergedFilePath = Join-Path -Pat
 if ([string]::IsNullOrEmpty($AnalysisSettingsFile)) { $AnalysisSettingsFile = Join-Path -Path $BuildRoot -ChildPath "PSScriptAnalyzerSettings.psd1" }
 if ([string]::IsNullOrEmpty($AnalysisResultsFile)) { $AnalysisResultsFile = Join-Path -Path $BuildOutputDirectory -ChildPath "AnalysisResults.xml" }
 if ([string]::IsNullOrEmpty($AnalysisSummaryFile)) { $AnalysisSummaryFile = Join-Path -Path $BuildOutputDirectory -ChildPath "AnalysisSummary.txt" }
-if ([string]::IsNullOrEmpty($ArchiveName)) { $ArchiveName = "$Name-$$Version$VersionSuffix.zip" }
+if ([string]::IsNullOrEmpty($ArchiveName)) { $ArchiveName = "$Name-$$Version$Prerelease.zip" }
 if ([string]::IsNullOrEmpty($ArchiveDestination)) { $ArchiveDestination = Join-Path -Path $BuildOutputDirectory -ChildPath $ArchiveName }
 
 Task "Dependencies" {
@@ -258,7 +258,7 @@ Task "Compile" @{
             NestedModules = $NestedModules
             DefaultCommandPrefix = $DefaultCommandPrefix
             Dependencies = $Dependencies
-            Prerelease = $VersionSuffix
+            Prerelease = $Prerelease
             RequireLicenseAcceptance = $RequireLicenseAcceptance
             LicenseUri = $LicenseUri
             ProjectUri = $ProjectUri
@@ -268,28 +268,31 @@ Task "Compile" @{
             PSData = $PSData
         }
         Invoke-CreateModuleManifest @manifestArgs
+    }
+}
 
-        if ($CreateDocumentation)
-        {
-            #Create module documentation
-            Invoke-CreateMarkdown -Path $DocumentationPath -Manifest $ManifestDestination
-            Invoke-CreateHelp -Source $DocumentationPath -Destination $BuildOutput
+Task "Docs" @{
+    If = {$CreateDocumentation}
+    Jobs = "Compile", {
+        Invoke-CreateMarkdown -Path $DocumentationPath -Manifest $ManifestDestination
+        Invoke-CreateHelp -Source $DocumentationPath -Destination $BuildOutput
+    }
+}
+
+Task "Sign" @{
+    If = {$Sign}
+    Jobs = "Compile", "Docs", {
+        $signArgs = @{
+            Name = $Name
+            Path = $BuildOutput
+            CertificateThumbprint = $CertificateThumbprint
+            CertificateSubject = $CertificateSubject
+            CertificatePath = $CertificatePath
+            CertificatePassword = $CertificatePassword
+            HashAlgorithm = $SignHashAlgorithm
         }
 
-        #Sign module files
-        if ($Sign)
-        {
-            $signArgs = @{
-                Name = $Name
-                Path = $BuildOutput
-                CertificateThumbprint = $CertificateThumbprint
-                CertificateSubject = $CertificateSubject
-                CertificatePath = $CertificatePath
-                CertificatePassword = $CertificatePassword
-                HashAlgorithm = $SignHashAlgorithm
-            }
-            Invoke-Sign @signArgs
-        }
+        Invoke-Sign @signArgs
     }
 }
 
@@ -327,10 +330,11 @@ Task "Test" "Compile", {
 }
 
 Task "Archive" "Compile", {
-    #Compress-Archive -Path $BuildOutput -DestinationPath $ArchiveDestination -Force
+    Compress-Archive -Path $BuildOutput -DestinationPath $ArchiveDestination -Force
 }
 
-Task "Build" "Compile", "Archive", "Analyze", "Test"
+Task "Build" "Compile", "Docs", "Sign", "Archive"
+
 Task "Publish" "Build", {
     if ($PublishToAppveyor)
     {

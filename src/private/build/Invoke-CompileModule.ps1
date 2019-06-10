@@ -61,6 +61,6 @@ function Invoke-CompileModule
             [void]$builder.AppendLine("Export-ModuleMember -Function @($($publicFunctions.ForEach({ "'$_'" }) -join ", "))")
         }
 
-        Set-Content -Path $Destination -Value ($builder.ToString()) -Force
+        [IO.File]::WriteAllText($Destination, $builder.ToString())
     }
 }
