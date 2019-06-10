@@ -170,7 +170,7 @@ if ([string]::IsNullOrEmpty($MergedFilePath)) { $MergedFilePath = Join-Path -Pat
 if ([string]::IsNullOrEmpty($AnalysisSettingsFile)) { $AnalysisSettingsFile = Join-Path -Path $BuildRoot -ChildPath "PSScriptAnalyzerSettings.psd1" }
 if ([string]::IsNullOrEmpty($AnalysisResultsFile)) { $AnalysisResultsFile = Join-Path -Path $BuildOutputDirectory -ChildPath "AnalysisResults.xml" }
 if ([string]::IsNullOrEmpty($AnalysisSummaryFile)) { $AnalysisSummaryFile = Join-Path -Path $BuildOutputDirectory -ChildPath "AnalysisSummary.txt" }
-if ([string]::IsNullOrEmpty($ArchiveName)) { $ArchiveName = "$Name-$$Version$Prerelease.zip" }
+if ([string]::IsNullOrEmpty($ArchiveName)) { $ArchiveName = "$Name-$($Version)$($Prerelease).zip" }
 if ([string]::IsNullOrEmpty($ArchiveDestination)) { $ArchiveDestination = Join-Path -Path $BuildOutputDirectory -ChildPath $ArchiveName }
 
 Task "Dependencies" {
