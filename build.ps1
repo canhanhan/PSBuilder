@@ -11,6 +11,7 @@ if ($MyInvocation.InvocationName -eq '.')
     $ProjectUri = "https://github.com/finarfin/PSBuilder"
     $LicenseUri = "https://github.com/finarfin/PSBuilder/blob/master/LICENSE"
     $HelpInfoUri = "https://github.com/finarfin/PSBuilder/blob/master/docs/PSBuilder.md"
+    $RequiredAssemblies = @("System.IO.Compression", "System.IO.Compression.FileSystem")
     $Dependencies = @(
         @{ Name="InvokeBuild"; MinimumVersion="5.4.2" },
         @{ Name="Pester"; MinimumVersion="4.6.0" },

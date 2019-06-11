@@ -330,7 +330,32 @@ Task "Test" "Compile", {
 }
 
 Task "Archive" "Compile", {
-    Compress-Archive -Path $BuildOutput -DestinationPath $ArchiveDestination -Force
+    $zipFile = [System.IO.FileStream]::new($ArchiveDestination, [System.IO.FileMode]::Create)
+    $archive = [System.IO.Compression.ZipArchive]::new($zipFile, [System.IO.Compression.ZipArchiveMode]::Create)
+    try
+    {
+        (Get-ChildItem -Path $BuildOutput -Recurse -File).ForEach({
+            $name = $_.FullName.Substring($BuildOutput.Length + 1)
+            $entry = $archive.CreateEntry($name)
+            $entry.LastWriteTime = $_.LastWriteTime
+            $fs = [System.IO.FileStream]::new($_.FullName, [System.IO.FileMode]::Open, [System.IO.FileAccess]::Read, [System.IO.FileShare]::ReadWrite)
+            $stream = $entry.Open()
+            try
+            {
+                $fs.CopyTo($stream, 81920)
+            }
+            finally
+            {
+                if ($null -ne $stream) { $stream.Dispose() }
+                if ($null -ne $fs) { $fs.Dispose() }
+            }
+        })
+    }
+    finally
+    {
+        if ($null -ne $archive) { $archive.Dispose() }
+        if ($null -ne $zipFile) { $zipFile.Dispose() }
+    }
 }
 
 Task "Build" "Compile", "Docs", "Sign", "Archive"
